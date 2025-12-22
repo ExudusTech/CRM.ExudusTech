@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useInboxController } from './hooks/useInboxController';
 import { ViewModeToggle } from './components/ViewModeToggle';
 import { InboxOverviewView } from './components/InboxOverviewView';
@@ -6,6 +7,11 @@ import { InboxListView } from './components/InboxListView';
 import { InboxFocusView } from './components/InboxFocusView';
 
 export const InboxPage: React.FC = () => {
+  const router = useRouter();
+
+  // Controla “intenção” ao abrir a Lista (ex.: abrir já com sugestões expandidas)
+  const [listPreset, setListPreset] = useState<'default' | 'suggestions-expanded'>('default');
+
   const {
     // View Mode
     viewMode,
@@ -42,6 +48,14 @@ export const InboxPage: React.FC = () => {
     handleSnoozeSuggestion,
   } = useInboxController();
 
+  const listDefaults = useMemo(
+    () => ({
+      suggestionsDefaultOpen: true,
+      suggestionsDefaultShowAll: listPreset === 'suggestions-expanded',
+    }),
+    [listPreset]
+  );
+
   return (
     <div className="max-w-6xl mx-auto py-8 px-6">
       {/* Header */}
@@ -64,12 +78,26 @@ export const InboxPage: React.FC = () => {
           todayTasks={todayTasks}
           upcomingActivities={upcomingActivities}
           aiSuggestions={aiSuggestions}
-          onGoToList={() => setViewMode('list')}
+          onGoToList={() => {
+            setListPreset('default');
+            setViewMode('list');
+          }}
           onStartFocus={() => {
             setFocusIndex(0);
             setViewMode('focus');
           }}
           onAcceptSuggestion={handleAcceptSuggestion}
+
+          onOpenOverdue={() => router.push('/activities?filter=overdue')}
+          onOpenToday={() => router.push('/activities?filter=today')}
+          onOpenCriticalSuggestions={() => {
+            setListPreset('suggestions-expanded');
+            setViewMode('list');
+          }}
+          onOpenPending={() => {
+            setListPreset('default');
+            setViewMode('list');
+          }}
         />
       ) : viewMode === 'list' ? (
         <InboxListView
@@ -84,6 +112,8 @@ export const InboxPage: React.FC = () => {
           onAcceptSuggestion={handleAcceptSuggestion}
           onDismissSuggestion={handleDismissSuggestion}
           onSnoozeSuggestion={handleSnoozeSuggestion}
+          suggestionsDefaultOpen={listDefaults.suggestionsDefaultOpen}
+          suggestionsDefaultShowAll={listDefaults.suggestionsDefaultShowAll}
           onSelectActivity={(id) => {
             const index = focusQueue.findIndex(item => item.id === id);
             if (index !== -1) {

@@ -224,3 +224,28 @@ export async function refineBoardWithAI(
 export async function parseNaturalLanguageAction(text: string): Promise<ParsedAction> {
   return await callAIProxy<ParsedAction>('parseNaturalLanguageAction', { text });
 }
+
+export type RewriteMessageDraftInput = {
+  channel: 'WHATSAPP' | 'EMAIL';
+  currentSubject?: string;
+  currentMessage?: string;
+  nextBestAction?: {
+    action?: string;
+    reason?: string;
+    actionType?: 'CALL' | 'MEETING' | 'EMAIL' | 'TASK' | 'WHATSAPP';
+    urgency?: 'low' | 'medium' | 'high';
+  };
+  cockpitSnapshot?: unknown;
+};
+
+export type RewriteMessageDraftResult = {
+  subject?: string;
+  message: string;
+};
+
+export async function rewriteMessageDraft(
+  input: RewriteMessageDraftInput,
+  _config?: AIConfigLegacy
+): Promise<RewriteMessageDraftResult> {
+  return await callAIProxy<RewriteMessageDraftResult>('rewriteMessageDraft', input);
+}

@@ -47,6 +47,7 @@
 export type AIAction =
   | 'analyzeLead'
   | 'generateEmailDraft'
+  | 'rewriteMessageDraft'
   | 'generateObjectionResponse'
   | 'generateDailyBriefing'
   | 'generateRescueMessage'

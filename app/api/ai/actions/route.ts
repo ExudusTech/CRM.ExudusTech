@@ -30,6 +30,7 @@ type AIActionResponse<T = unknown> = {
 type AIAction =
   | 'analyzeLead'
   | 'generateEmailDraft'
+  | 'rewriteMessageDraft'
   | 'generateObjectionResponse'
   | 'generateDailyBriefing'
   | 'generateRescueMessage'
@@ -94,6 +95,29 @@ const ParsedActionSchema = z.object({
   companyName: z.string().optional(),
   confidence: z.number().min(0).max(1),
 });
+
+const RewriteMessageDraftSchema = z.object({
+  subject: z
+    .string()
+    .max(120)
+    .optional()
+    .describe('Assunto do email (somente para canal EMAIL).'),
+  message: z
+    .string()
+    .max(1600)
+    .describe('Mensagem final para enviar no canal escolhido.'),
+});
+
+function safeContextText(v: unknown, maxBytes = 80_000): string {
+  if (v == null) return '';
+  try {
+    const text = typeof v === 'string' ? v : JSON.stringify(v);
+    if (text.length <= maxBytes) return text;
+    return text.slice(0, maxBytes) + '\n... [TRUNCADO]';
+  } catch {
+    return '';
+  }
+}
 
 function json<T>(body: T, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -197,6 +221,62 @@ Seja conciso. Português do Brasil.`,
 Escreva um email conciso e eficaz em português do Brasil.`,
         });
         return json<AIActionResponse>({ result: result.text });
+      }
+
+      case 'rewriteMessageDraft': {
+        const {
+          channel,
+          currentSubject,
+          currentMessage,
+          nextBestAction,
+          cockpitSnapshot,
+        } = data as any;
+
+        const channelLabel = channel === 'EMAIL' ? 'EMAIL' : 'WHATSAPP';
+
+        const snapshotText = safeContextText(cockpitSnapshot);
+        const nbaText = safeContextText(nextBestAction);
+
+        const result = await generateObject({
+          model,
+          maxRetries: 3,
+          schema: RewriteMessageDraftSchema,
+          prompt: `Você é um vendedor sênior e copywriter.
+Sua tarefa é REESCREVER (melhorar) uma mensagem para enviar ao cliente.
+
+CANAL: ${channelLabel}
+
+RASCUNHO ATUAL:
+- subject (se houver): ${String(currentSubject ?? '')}
+- message: ${String(currentMessage ?? '')}
+
+PRÓXIMA AÇÃO (sugestão/NBA):
+${nbaText || '[não fornecida]'}
+
+CONTEXTO COMPLETO (cockpitSnapshot):
+${snapshotText || '[não fornecido]'}
+
+REGRAS:
+1) Português do Brasil, natural e humano. Evite jargão e evite rótulos tipo "Contexto:"/"Sobre:".
+2) Use o contexto para personalizar (nome, deal, etapa, próximos passos), mas NÃO invente fatos.
+3) Para WHATSAPP: curto, direto e MUITO legível no WhatsApp. Use quebras de linha (parágrafos) e, quando houver opções, use lista com marcadores no formato "- item" (hífen + espaço). Evite parágrafos longos. 3–10 linhas.
+4) Para EMAIL: devolva subject + body (message = body). Aplique boas práticas de email de vendas/CRM:
+   - Assunto curto e específico (<= 80), sem ALL CAPS e sem "RE:" falso.
+   - Corpo SEMPRE bem escaneável: parágrafos curtos (1–2 frases), com linhas em branco entre blocos.
+   - Estrutura sugerida (adapte ao contexto):
+     a) Saudação breve (use o nome se tiver certeza).
+     b) 1 frase de contexto (por que está falando agora).
+     c) 1–2 bullets com valor/objetivo ou próximos passos (use "- ").
+     d) CTA claro e simples (uma pergunta) e, se houver opções de agenda, liste em bullets ("- segunda 10h", "- terça 15h").
+     e) Fechamento curto (ex.: "Obrigado!"), sem assinatura com dados pessoais.
+   - Evite bloco único de texto: NÃO devolva tudo em um parágrafo.
+   - Tamanho: 6–16 linhas no total (incluindo linhas em branco).
+5) Não inclua placeholders (tipo "[nome]") e não inclua assinatura com dados pessoais.
+
+Retorne APENAS no formato do schema (subject opcional, message obrigatório).`,
+        });
+
+        return json<AIActionResponse>({ result: result.object });
       }
 
       case 'generateRescueMessage': {

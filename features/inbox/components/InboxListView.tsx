@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Activity } from '@/types';
 import { AISuggestion } from '../hooks/useInboxController';
@@ -35,6 +35,10 @@ interface InboxListViewProps {
   onDismissSuggestion: (id: string) => void;
   onSnoozeSuggestion: (id: string) => void;
   onSelectActivity: (id: string) => void;
+
+  // Presets de UI (ex.: vindo da Visão Geral)
+  suggestionsDefaultOpen?: boolean;
+  suggestionsDefaultShowAll?: boolean;
 }
 
 // Componente de Sugestão Simplificado (linha única)
@@ -142,9 +146,30 @@ const AISuggestionsCard: React.FC<{
   onAccept: (suggestion: AISuggestion) => void;
   onDismiss: (id: string) => void;
   onSnooze: (id: string) => void;
-}> = ({ suggestions, onAccept, onDismiss, onSnooze }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [showAll, setShowAll] = useState(false);
+  defaultOpen?: boolean;
+  defaultShowAll?: boolean;
+}> = ({
+  suggestions,
+  onAccept,
+  onDismiss,
+  onSnooze,
+  defaultOpen,
+  defaultShowAll,
+}) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen ?? true);
+  const [showAll, setShowAll] = useState(defaultShowAll ?? false);
+
+  useEffect(() => {
+    if (defaultOpen !== undefined) {
+      setIsOpen(defaultOpen);
+    }
+  }, [defaultOpen]);
+
+  useEffect(() => {
+    if (defaultShowAll !== undefined) {
+      setShowAll(defaultShowAll);
+    }
+  }, [defaultShowAll]);
 
   if (suggestions.length === 0) return null;
 
@@ -220,6 +245,8 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
   onDismissSuggestion,
   onSnoozeSuggestion,
   onSelectActivity,
+  suggestionsDefaultOpen,
+  suggestionsDefaultShowAll,
 }) => {
   return (
     <div className="space-y-6">
@@ -229,6 +256,8 @@ export const InboxListView: React.FC<InboxListViewProps> = ({
         onAccept={onAcceptSuggestion}
         onDismiss={onDismissSuggestion}
         onSnooze={onSnoozeSuggestion}
+        defaultOpen={suggestionsDefaultOpen}
+        defaultShowAll={suggestionsDefaultShowAll}
       />
 
       {/* Activities */}

@@ -14,6 +14,11 @@ interface InboxOverviewViewProps {
   onGoToList: () => void;
   onStartFocus: () => void;
   onAcceptSuggestion: (suggestion: AISuggestion) => void;
+
+  onOpenOverdue: () => void;
+  onOpenToday: () => void;
+  onOpenCriticalSuggestions: () => void;
+  onOpenPending: () => void;
 }
 
 const StatCard: React.FC<{
@@ -120,6 +125,10 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
   onGoToList,
   onStartFocus,
   onAcceptSuggestion,
+  onOpenOverdue,
+  onOpenToday,
+  onOpenCriticalSuggestions,
+  onOpenPending,
 }) => {
   const todayTotal = todayMeetings.length + todayTasks.length;
   const totalPending = overdueActivities.length + todayTotal + aiSuggestions.length;
@@ -178,28 +187,28 @@ export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
           value={overdueActivities.length}
           tone={overdueActivities.length > 0 ? 'danger' : 'success'}
           hint={overdueActivities.length > 0 ? 'Prioridade máxima' : 'Tudo em dia'}
-          onClick={onGoToList}
+          onClick={onOpenOverdue}
         />
         <StatCard
           label="Hoje"
           value={todayTotal}
           tone={todayTotal > 0 ? 'warning' : 'success'}
           hint={todayTotal > 0 ? `${todayMeetings.length} reuniões • ${todayTasks.length} tarefas` : 'Sem tarefas para hoje'}
-          onClick={onGoToList}
+          onClick={onOpenToday}
         />
         <StatCard
           label="Sugestões críticas"
           value={highPrioritySuggestions.length}
           tone={highPrioritySuggestions.length > 0 ? 'warning' : 'neutral'}
           hint={highPrioritySuggestions.length > 0 ? 'Risco/Oportunidade agora' : 'Sem urgências'}
-          onClick={onGoToList}
+          onClick={onOpenCriticalSuggestions}
         />
         <StatCard
           label="Pendências"
           value={totalPending}
           tone={totalPending > 0 ? 'neutral' : 'success'}
           hint={upcomingActivities.length > 0 ? `${upcomingActivities.length} próximos` : 'Backlog leve'}
-          onClick={onGoToList}
+          onClick={onOpenPending}
         />
       </div>
 
