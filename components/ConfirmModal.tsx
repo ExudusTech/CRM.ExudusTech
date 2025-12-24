@@ -36,8 +36,8 @@
  * ```
  */
 
-import React, { useId, useRef, useEffect } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import React, { useId, useRef } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { FocusTrap, useFocusReturn } from '@/lib/a11y';
 
 /**

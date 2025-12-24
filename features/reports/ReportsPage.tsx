@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TrendingUp, Clock, Target, DollarSign, Trophy, Users, Download, Settings } from 'lucide-react';
 import { useDashboardMetrics, PeriodFilter, COMPARISON_LABELS } from '../dashboard/hooks/useDashboardMetrics';
@@ -347,10 +348,13 @@ const ReportsPage: React.FC = () => {
                     }`}>
                     {index + 1}
                   </div>
-                  <img
+                  <Image
                     src={rep.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${rep.name}`}
                     alt={rep.name}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full"
+                    unoptimized
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{rep.name}</p>

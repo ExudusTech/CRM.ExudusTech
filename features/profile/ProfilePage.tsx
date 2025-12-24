@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { getErrorMessage } from '@/utils/errorUtils';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -316,10 +317,13 @@ export const ProfilePage: React.FC = () => {
                         {/* Avatar Grande com Upload */}
                         <div className="relative group">
                             {avatarUrl ? (
-                                <img
+                                <Image
                                     src={avatarUrl}
                                     alt="Avatar"
+                                    width={80}
+                                    height={80}
                                     className="w-20 h-20 rounded-2xl object-cover shadow-xl"
+                                    unoptimized
                                 />
                             ) : (
                                 <div className={`w-20 h-20 rounded-2xl bg-linear-to-br ${gradient} flex items-center justify-center text-white font-bold text-2xl shadow-xl`}>

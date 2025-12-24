@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     }
 
     // Test: Find stage
-    const { data: stages, error: stageError } = await supabase
+    const { data: stages } = await supabase
         .from('board_stages')
         .select('id, name, label')
         .eq('organization_id', context.organizationId)
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     const stageId = stages[0].id;
 
     // Test: Find deals
-    const { data: deals, error: dealsError } = await supabase
+    const { data: deals } = await supabase
         .from('deals')
         .select('id, title, value, is_won, is_lost')
         .eq('organization_id', context.organizationId)

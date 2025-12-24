@@ -157,7 +157,7 @@ export const AuditLogDashboard: React.FC = () => {
     try {
       // Calculate date filter
       const now = new Date();
-      let fromDate = new Date();
+      const fromDate = new Date();
       switch (timeFilter) {
         case '24h':
           fromDate.setHours(fromDate.getHours() - 24);

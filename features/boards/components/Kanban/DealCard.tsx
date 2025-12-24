@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { DealView } from '@/types';
 import { Building2, Hourglass, Trophy, XCircle } from 'lucide-react';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
@@ -238,11 +239,14 @@ export const DealCard: React.FC<DealCardProps> = ({
         <div className="flex items-center gap-2">
           {deal.owner && deal.owner.name !== 'Sem Dono' && (
             deal.owner.avatar ? (
-              <img
+              <Image
                 src={deal.owner.avatar}
                 alt={`Responsável: ${deal.owner.name}`}
+                width={20}
+                height={20}
                 className="w-5 h-5 rounded-full ring-1 ring-white dark:ring-slate-800"
                 title={`Responsável: ${deal.owner.name}`}
+                unoptimized
               />
             ) : (
               <div

@@ -210,8 +210,8 @@ export const useMoveDeal = () => {
 
       // Determine new status
       const targetStage = board.stages.find(s => s.id === targetStageId);
-      let isWon = explicitWin || targetStage?.linkedLifecycleStage === 'CUSTOMER' || targetStageId === board.wonStageId;
-      let isLost = explicitLost || targetStage?.linkedLifecycleStage === 'OTHER' || targetStageId === board.lostStageId;
+      const isWon = explicitWin || targetStage?.linkedLifecycleStage === 'CUSTOMER' || targetStageId === board.wonStageId;
+      const isLost = explicitLost || targetStage?.linkedLifecycleStage === 'OTHER' || targetStageId === board.lostStageId;
 
       // Optimistically update the cache
       queryClient.setQueriesData<Deal[] | DealView[]>(

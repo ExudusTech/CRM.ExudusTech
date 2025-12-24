@@ -24,9 +24,10 @@
  * ```
  */
 
-import React, { lazy, Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   KanbanSquare,
@@ -37,7 +38,6 @@ import {
   BarChart3,
   Inbox,
   Sparkles,
-  Zap,
   LogOut,
   User,
   Bug,
@@ -50,7 +50,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { prefetchRoute, RouteName } from '@/lib/prefetch';
 import { isDebugMode, enableDebugMode, disableDebugMode } from '@/lib/debug';
-import { SkipLink, VisuallyHidden } from '@/lib/a11y';
+import { SkipLink } from '@/lib/a11y';
 
 // Lazy load AI Assistant (deprecated - using UIChat now)
 // const AIAssistant = lazy(() => import('./AIAssistant'));
@@ -132,10 +132,9 @@ const NavItem = ({
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { darkMode, toggleDarkMode } = useTheme();
-  const { isGlobalAIOpen, setIsGlobalAIOpen, activeBoard, sidebarCollapsed, setSidebarCollapsed } = useCRM();
+  const { isGlobalAIOpen, setIsGlobalAIOpen, sidebarCollapsed, setSidebarCollapsed } = useCRM();
   const { profile, signOut } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [debugEnabled, setDebugEnabled] = useState(isDebugMode);
 
@@ -274,10 +273,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 }`}
             >
               {profile?.avatar_url ? (
-                <img
+                <Image
                   src={profile.avatar_url}
                   alt=""
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-slate-800 shadow-lg"
+                  unoptimized
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm ring-2 ring-white dark:ring-slate-800 shadow-lg shrink-0" aria-hidden="true">

@@ -19,17 +19,15 @@ describe('useDealsLogic - Null Safety', () => {
         const { result } = renderHook(() => useDealsLogic());
 
         // Should work fine for normal deal
-        try {
+        await act(async () => {
             await result.current.removeItemFromDeal('1', 'item1');
-        } catch (e) {
-            expect(e).toBeUndefined();
-        }
+        });
 
         // Should NOT crash for malformed deal
-        expect(() => {
-            act(() => {
-                result.current.removeItemFromDeal('2', 'some-item');
-            });
-        }).not.toThrow();
+        await expect(
+            act(async () => {
+                await result.current.removeItemFromDeal('2', 'some-item');
+            })
+        ).resolves.toBeUndefined();
     });
 });

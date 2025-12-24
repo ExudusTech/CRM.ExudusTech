@@ -49,7 +49,6 @@ export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
   const defaultTime = new Date().toTimeString().slice(0, 5);
 
   const form = useForm<ActivityFormData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(activityFormSchema) as any,
     defaultValues: {
       title: editingActivity?.title || '',

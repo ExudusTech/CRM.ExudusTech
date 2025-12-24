@@ -47,7 +47,7 @@ export const migrateLocalStorage = () => {
     const storedLeads = localStorage.getItem('crm_leads');
     const storedContacts = localStorage.getItem('crm_contacts');
 
-    let leads: Lead[] = storedLeads ? JSON.parse(storedLeads) : [];
+    const leads: Lead[] = storedLeads ? JSON.parse(storedLeads) : [];
     let contacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [];
 
     if (leads.length > 0) {

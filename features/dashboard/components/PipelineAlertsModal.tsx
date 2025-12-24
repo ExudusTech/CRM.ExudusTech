@@ -85,7 +85,6 @@ export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
   const totalAlerts = stagnantDeals.length + dealsWithoutActivity.length;
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={(e) => e.target === e.currentTarget && onClose()}

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { DealView, CustomFieldDefinition, BoardStage } from '@/types';
 import { ActivityStatusIcon } from './ActivityStatusIcon';
 import { getActivityStatus } from '@/features/boards/hooks/useBoardsController';
@@ -101,7 +102,7 @@ export const KanbanList: React.FC<KanbanListProps> = ({
                 </td>
                 <td className="px-6 py-3">
                   <div className="flex items-center gap-2">
-                    <img src={deal.owner.avatar} alt="" className="w-5 h-5 rounded-full" />
+                    <Image src={deal.owner.avatar} alt="" width={20} height={20} className="w-5 h-5 rounded-full" unoptimized />
                     <span className="text-xs text-slate-500">{deal.owner.name}</span>
                   </div>
                 </td>

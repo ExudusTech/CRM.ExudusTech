@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Bell, Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Bell, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { useSystemNotifications, SystemNotification } from '@/hooks/useSystemNotifications';
 import Link from 'next/link';
 
@@ -29,7 +29,7 @@ export const NotificationPopover = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleNotificationClick = (id: string, link?: string) => {
+    const handleNotificationClick = (id: string) => {
         markAsRead(id);
         setIsOpen(false);
     };
@@ -121,7 +121,7 @@ export const NotificationPopover = () => {
                                     <li key={notification.id} className={notification.readAt ? 'opacity-60 bg-slate-50/30 dark:bg-white/5' : ''}>
                                         <Link
                                             href={notification.actionLink || '#'}
-                                            onClick={() => handleNotificationClick(notification.id, notification.actionLink)}
+                                            onClick={() => handleNotificationClick(notification.id)}
                                             className="flex gap-4 p-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group"
                                         >
                                             <div className={`mt-1 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${getBgColor(notification.type)}`}>

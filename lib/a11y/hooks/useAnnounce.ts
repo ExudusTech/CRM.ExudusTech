@@ -7,9 +7,6 @@ export interface UseAnnounceOptions {
   clearDelay?: number;
 }
 
-// Global live region container (shared across all instances)
-let liveRegionContainer: HTMLDivElement | null = null;
-
 function getOrCreateLiveRegion(mode: 'polite' | 'assertive'): HTMLDivElement {
   const id = `live-region-${mode}`;
   let region = document.getElementById(id) as HTMLDivElement | null;

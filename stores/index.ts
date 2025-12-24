@@ -30,8 +30,6 @@
  */
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
-import type { Deal, Contact, Company, Activity, Board } from '@/types';
 
 // ============ UI STATE STORE ============
 
@@ -192,8 +190,9 @@ export const useFormStore = create<FormState>()(
         getDraft: formId => get().drafts[formId] ?? null,
         clearDraft: formId =>
           set(state => {
-            const { [formId]: _, ...rest } = state.drafts;
-            return { drafts: rest };
+            const drafts = { ...state.drafts };
+            delete drafts[formId];
+            return { drafts };
           }),
         clearAllDrafts: () => set({ drafts: {} }),
 
