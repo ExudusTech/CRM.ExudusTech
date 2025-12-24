@@ -8,6 +8,10 @@
   - Compatibilidade: reintroduzido `/api/ai/actions` + `lib/supabase/ai-proxy.ts`/`lib/ai/actionsClient.ts` para manter features que ainda dependem do fluxo RPC antigo, enquanto o novo `/api/ai/tasks/*` coexiste.
   - Correção pós-merge: `test/helpers/salesTeamFixtures.ts` reparado para manter `typecheck` e `vitest` passando.
 
+- **Zerar dívida (remoção de legado não usado)**:
+  - Removidos `hooks/useAgent.ts` e `components/ai/ToolInvocation.tsx` (código legado que não era referenciado por nenhuma tela e continha caminhos descontinuados).
+  - Validação: `typecheck`, `test`, `lint` e `build` seguem passando após a remoção.
+
 - **Atualização do AI SDK para versões estáveis (latest)**:
   - `ai`: `6.0.3` (antes: `^6.0.0-beta.157`)
   - `@ai-sdk/react`: `3.0.3` (antes: `^3.0.0-beta.160`)
