@@ -40,6 +40,7 @@
   - UX (Deals): ícones no composer de nota do modal do deal agora funcionam: **modelo de nota** (documento) e **ditado por voz** com feedback quando o navegador bloquear permissão.
   - UX (Deals): removidos temporariamente os ícones do composer de nota (modelo/ditado) até definirmos a UX final.
   - Feature (Produtos): adicionado catálogo em **Configurações → Produtos/Serviços** (CRUD básico) e suporte a **item personalizado** no deal (quando o produto depende do cliente).
+  - Feature (Produtos): catálogo agora permite **editar** produto (nome, preço, SKU, descrição).
 
 ## 24/12/2025
 

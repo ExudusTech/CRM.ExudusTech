@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Package, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Package, Pencil, Plus, Save, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { productsService } from '@/lib/supabase';
 import type { Product } from '@/types';
 
@@ -22,6 +22,12 @@ export const ProductsCatalogManager: React.FC = () => {
   const [description, setDescription] = useState('');
 
   const canCreate = name.trim().length > 1 && Number.isFinite(Number(price));
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPrice, setEditPrice] = useState<string>('0');
+  const [editSku, setEditSku] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -88,6 +94,54 @@ export const ProductsCatalogManager: React.FC = () => {
       return;
     }
     await load();
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('crm:products-updated'));
+  };
+
+  const startEdit = (p: Product) => {
+    setEditingId(p.id);
+    setEditName(p.name || '');
+    setEditPrice(String(p.price ?? 0));
+    setEditSku(p.sku || '');
+    setEditDescription(p.description || '');
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditName('');
+    setEditPrice('0');
+    setEditSku('');
+    setEditDescription('');
+  };
+
+  const saveEdit = async () => {
+    if (!editingId) return;
+    const name = editName.trim();
+    const price = Number(editPrice);
+
+    if (name.length < 2) {
+      setError('Nome inválido.');
+      return;
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      setError('Preço inválido.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    const res = await productsService.update(editingId, {
+      name,
+      price,
+      sku: editSku.trim() || undefined,
+      description: editDescription.trim() || undefined,
+    });
+    if (res.error) {
+      setError(res.error.message);
+      setLoading(false);
+      return;
+    }
+    await load();
+    cancelEdit();
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('crm:products-updated'));
   };
 
@@ -196,25 +250,101 @@ export const ProductsCatalogManager: React.FC = () => {
             <div className="space-y-2">
               {sorted.map((p) => {
                 const isActive = p.active !== false;
+                const isEditing = editingId === p.id;
                 return (
                   <div
                     key={p.id}
                     className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/3 px-4 py-3"
                   >
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <div className="font-semibold text-slate-900 dark:text-white truncate">{p.name}</div>
-                        {!isActive && (
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300">
-                            Inativo
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                        {formatBRL(p.price)}{p.sku ? ` • SKU: ${p.sku}` : ''}{p.description ? ` • ${p.description}` : ''}
-                      </div>
+                      {isEditing ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                          <div className="sm:col-span-5">
+                            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Nome</label>
+                            <input
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Preço</label>
+                            <input
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              inputMode="decimal"
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                            />
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">SKU</label>
+                            <input
+                              value={editSku}
+                              onChange={(e) => setEditSku(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                            />
+                          </div>
+                          <div className="sm:col-span-3">
+                            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Descrição</label>
+                            <input
+                              value={editDescription}
+                              onChange={(e) => setEditDescription(e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2">
+                            <div className="font-semibold text-slate-900 dark:text-white truncate">{p.name}</div>
+                            {!isActive && (
+                              <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300">
+                                Inativo
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                            {formatBRL(p.price)}{p.sku ? ` • SKU: ${p.sku}` : ''}{p.description ? ` • ${p.description}` : ''}
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
+                      {isEditing ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={saveEdit}
+                            className="px-2 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
+                            title="Salvar"
+                            aria-label="Salvar alterações"
+                            disabled={loading}
+                          >
+                            <Save className="h-4 w-4 text-primary-600" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEdit}
+                            className="px-2 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
+                            title="Cancelar"
+                            aria-label="Cancelar edição"
+                            disabled={loading}
+                          >
+                            <X className="h-4 w-4 text-slate-500" />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => startEdit(p)}
+                          className="px-2 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"
+                          title="Editar"
+                          aria-label="Editar produto"
+                          disabled={loading}
+                        >
+                          <Pencil className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => toggleActive(p, !isActive)}
