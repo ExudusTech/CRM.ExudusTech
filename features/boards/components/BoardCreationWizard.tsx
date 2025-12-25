@@ -674,6 +674,7 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
   const displayBoard = previewBoard || generatedBoard;
 
   const isSelectHome = step === 'select' && selectMode === 'home' && !isChatMode;
+  const isSelectBrowse = step === 'select' && selectMode === 'browse' && !isChatMode;
 
   if (!isOpen) return null;
 
@@ -690,7 +691,7 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
       <div
         // NOTE: we hard-cap width/height by viewport to avoid overflow on small screens.
         // `dvh` handles mobile browser chrome better than `vh`.
-        className={`relative z-10 w-full h-full sm:h-auto ${isChatMode ? 'lg:max-w-6xl' : 'lg:max-w-5xl'} ${isSelectHome ? 'sm:max-w-xl lg:max-w-xl' : ''} bg-white dark:bg-dark-card rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] transition-all duration-300`}
+        className={`relative z-10 w-full h-full sm:h-auto ${isChatMode ? 'lg:max-w-6xl' : 'lg:max-w-5xl'} ${isSelectHome ? 'sm:max-w-xl lg:max-w-xl' : ''} ${isSelectBrowse ? 'sm:max-w-4xl lg:max-w-4xl' : ''} bg-white dark:bg-dark-card rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] transition-all duration-300`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-slate-200 dark:border-white/10 shrink-0">
@@ -1350,12 +1351,9 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
           </div>
         </div>
 
-        {/* Footer - Fixed Actions */}
-        <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-dark-card shrink-0">
-          {step === 'select' && (
-            <div className="text-center text-xs text-slate-400" />
-          )}
-
+        {/* Footer - Fixed Actions (only when we actually have actions) */}
+        {step !== 'select' && (
+          <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-dark-card shrink-0">
           {step === 'playbook-preview' && selectedPlaybookId && (
             <div className="flex gap-3 justify-between items-center w-full">
               <button
@@ -1442,7 +1440,8 @@ export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
               </div>
             </div>
           )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
