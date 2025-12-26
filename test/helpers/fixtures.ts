@@ -167,6 +167,10 @@ async function createDeal(params: {
   return { dealId: row.id };
 }
 
+/**
+ * Função pública `createMinimalFixtures` do projeto.
+ * @returns {Promise<TestFixtureBundle>} Retorna um valor do tipo `Promise<TestFixtureBundle>`.
+ */
 export async function createMinimalFixtures(): Promise<TestFixtureBundle> {
   const runId = getRunId('next-ai');
 
@@ -222,6 +226,12 @@ export async function createMinimalFixtures(): Promise<TestFixtureBundle> {
   };
 }
 
+/**
+ * Função pública `cleanupFixtures` do projeto.
+ *
+ * @param {string} runId - Identificador do recurso.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export async function cleanupFixtures(runId: string): Promise<void> {
   const supabase = getSupabaseAdminClient();
 

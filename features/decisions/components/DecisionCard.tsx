@@ -63,6 +63,24 @@ const getPriorityBadge = (priority: string) => {
   return badges[priority] || badges.medium;
 };
 
+/**
+ * Componente React `DecisionCard`.
+ *
+ * @param {DecisionCardProps} {
+  decision,
+  onApprove,
+  onReject,
+  onSnooze,
+  isExecuting = false,
+} - Parâmetro `{
+  decision,
+  onApprove,
+  onReject,
+  onSnooze,
+  isExecuting = false,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const DecisionCard: React.FC<DecisionCardProps> = ({
   decision,
   onApprove,

@@ -6,6 +6,12 @@ import { supabase } from '@/lib/supabase'
 import { getErrorMessage } from '@/utils/errorUtils'
 import { Loader2, Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react'
 
+/**
+ * Componente React `JoinClient`.
+ *
+ * @param {{ token: string | null; }} { token } - Parâmetro `{ token }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export function JoinClient({ token }: { token: string | null }) {
   const router = useRouter()
 

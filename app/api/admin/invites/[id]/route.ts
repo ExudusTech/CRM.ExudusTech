@@ -8,6 +8,13 @@ function json<T>(body: T, status = 200): Response {
   });
 }
 
+/**
+ * Handler HTTP `DELETE` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @param {{ params: Promise<{ id: string; }>; }} ctx - Contexto de execução.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function DELETE(req: Request, ctx: { params: Promise<{ id: string }> }) {
   if (!isAllowedOrigin(req)) return json({ error: 'Forbidden' }, 403);
 

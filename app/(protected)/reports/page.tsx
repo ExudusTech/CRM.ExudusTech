@@ -8,6 +8,10 @@ const ReportsPage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Reports`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Reports() {
     return <ReportsPage />
 }

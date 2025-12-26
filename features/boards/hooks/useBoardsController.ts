@@ -22,6 +22,12 @@ import { useAuth } from '@/context/AuthContext';
 import { useCRM } from '@/context/CRMContext';
 import { useAI } from '@/context/AIContext';
 
+/**
+ * Função pública `isDealRotting` do projeto.
+ *
+ * @param {DealView} deal - Parâmetro `deal`.
+ * @returns {boolean} Retorna um valor do tipo `boolean`.
+ */
 export const isDealRotting = (deal: DealView) => {
   const dateToCheck = deal.lastStageChangeDate || deal.updatedAt;
   const diff = new Date().getTime() - new Date(dateToCheck).getTime();
@@ -29,6 +35,12 @@ export const isDealRotting = (deal: DealView) => {
   return days > 10;
 };
 
+/**
+ * Função pública `getActivityStatus` do projeto.
+ *
+ * @param {DealView} deal - Parâmetro `deal`.
+ * @returns {"yellow" | "red" | "green" | "gray"} Retorna um valor do tipo `"yellow" | "red" | "green" | "gray"`.
+ */
 export const getActivityStatus = (deal: DealView) => {
   if (!deal.nextActivity) return 'yellow';
   if (deal.nextActivity.isOverdue) return 'red';
@@ -38,6 +50,10 @@ export const getActivityStatus = (deal: DealView) => {
   return 'gray';
 };
 
+/**
+ * Hook React `useBoardsController` que encapsula uma lógica reutilizável.
+ * @returns {{ boards: Board[]; boardsLoading: boolean; boardsFetched: boolean; activeBoard: Board | null; activeBoardId: string | null; handleSelectBoard: (boardId: string) => void; ... 45 more ...; handleLossReasonClose: () => void; }} Retorna um valor do tipo `{ boards: Board[]; boardsLoading: boolean; boardsFetched: boolean; activeBoard: Board | null; activeBoardId: string | null; handleSelectBoard: (boardId: string) => void; ... 45 more ...; handleLossReasonClose: () => void; }`.
+ */
 export const useBoardsController = () => {
   // Toast for feedback
   const { addToast } = useToast();

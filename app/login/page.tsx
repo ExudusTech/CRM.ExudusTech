@@ -6,6 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { getErrorMessage } from '@/utils/errorUtils'
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react'
 
+/**
+ * Componente React `LoginPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')

@@ -10,6 +10,16 @@ import { CRMProvider } from '@/context/CRMContext'
 import { AIProvider } from '@/context/AIContext'
 import Layout from '@/components/Layout'
 
+/**
+ * Componente React `ProtectedLayout`.
+ *
+ * @param {{ children: ReactNode; }} {
+    children,
+} - Parâmetro `{
+    children,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function ProtectedLayout({
     children,
 }: {

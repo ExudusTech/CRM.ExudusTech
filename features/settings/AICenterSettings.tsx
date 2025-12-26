@@ -7,6 +7,10 @@ import { AIConfigSection } from './components/AIConfigSection';
 import { AIPromptsManager } from './components/AIPromptsManager';
 import { AIFeaturesSection } from './components/AIFeaturesSection';
 
+/**
+ * Componente React `AICenterSettings`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AICenterSettings: React.FC = () => {
   const { profile } = useAuth();
   const { aiOrgEnabled, setAiOrgEnabled } = useCRM();

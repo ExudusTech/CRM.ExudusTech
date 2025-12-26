@@ -8,10 +8,18 @@ function json<T>(body: T, status = 200): Response {
   });
 }
 
+/**
+ * Handler HTTP `GET` deste endpoint (Next.js Route Handler).
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function GET() {
   return json({ error: 'Not Found' }, 404);
 }
 
+/**
+ * Handler HTTP `POST` deste endpoint (Next.js Route Handler).
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function POST() {
   return json({ error: 'Not Found' }, 404);
 }

@@ -8,6 +8,24 @@ type BootstrapInput = {
   password: string;
 };
 
+/**
+ * Função pública `bootstrapInstance` do projeto.
+ *
+ * @param {BootstrapInput} {
+  supabaseUrl,
+  serviceRoleKey,
+  companyName,
+  email,
+  password,
+} - Parâmetro `{
+  supabaseUrl,
+  serviceRoleKey,
+  companyName,
+  email,
+  password,
+}`.
+ * @returns {Promise<{ ok: false; error: string; organizationId?: undefined; userId?: undefined; } | { ok: true; organizationId: any; userId: string; error?: undefined; }>} Retorna um valor do tipo `Promise<{ ok: false; error: string; organizationId?: undefined; userId?: undefined; } | { ok: true; organizationId: any; userId: string; error?: undefined; }>`.
+ */
 export async function bootstrapInstance({
   supabaseUrl,
   serviceRoleKey,

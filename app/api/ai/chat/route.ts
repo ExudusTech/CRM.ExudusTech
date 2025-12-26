@@ -58,6 +58,12 @@ function asOptionalCockpitSnapshot(v: unknown): unknown | undefined {
     return v;
 }
 
+/**
+ * Handler HTTP `POST` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function POST(req: Request) {
     // Mitigação CSRF: endpoint autenticado por cookies.
     if (!isAllowedOrigin(req)) {

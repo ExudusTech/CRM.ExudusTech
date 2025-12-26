@@ -19,6 +19,14 @@ type DbPromptRow = {
   updated_at: string;
 };
 
+/**
+ * Função pública `getResolvedPrompt` do projeto.
+ *
+ * @param {SupabaseClient<any, "public", "public", any, any>} supabase - Parâmetro `supabase`.
+ * @param {string} organizationId - Identificador do recurso.
+ * @param {string} key - Parâmetro `key`.
+ * @returns {Promise<PromptResolution | null>} Retorna um valor do tipo `Promise<PromptResolution | null>`.
+ */
 export async function getResolvedPrompt(
   supabase: SupabaseClient,
   organizationId: string,

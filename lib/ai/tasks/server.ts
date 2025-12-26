@@ -21,21 +21,42 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
+/**
+ * Classe `AITaskHttpError` do projeto.
+ */
 export class AITaskHttpError extends Error {
   status: number;
   code: string;
 
-  constructor(status: number, code: string, message: string) {
+    /**
+   * Constrói uma instância de `AITaskHttpError`.
+   *
+   * @param {number} status - Parâmetro `status`.
+   * @param {string} code - Parâmetro `code`.
+   * @param {string} message - Parâmetro `message`.
+   * @returns {void} Não retorna valor.
+   */
+constructor(status: number, code: string, message: string) {
     super(message);
     this.status = status;
     this.code = code;
   }
 
-  toResponse() {
+    /**
+   * Método público `toResponse`.
+   * @returns {Response} Retorna um valor do tipo `Response`.
+   */
+toResponse() {
     return json({ error: { code: this.code, message: this.message } }, this.status);
   }
 }
 
+/**
+ * Função pública `requireAITaskContext` do projeto.
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<AITaskContext>} Retorna um valor do tipo `Promise<AITaskContext>`.
+ */
 export async function requireAITaskContext(req: Request): Promise<AITaskContext> {
   // Mitigação CSRF: endpoint autenticado por cookies.
   if (!isAllowedOrigin(req)) {

@@ -8,6 +8,10 @@ const SettingsPage = dynamic(
   { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `SettingsAI`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function SettingsAI() {
   return <SettingsPage tab="ai" />
 }

@@ -12,6 +12,10 @@ const DashboardPage = dynamic(
     }
 )
 
+/**
+ * Componente React `Dashboard`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Dashboard() {
     return <DashboardPage />
 }

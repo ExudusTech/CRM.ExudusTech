@@ -14,6 +14,10 @@ export interface SystemNotification {
     readAt?: string | null;
 }
 
+/**
+ * Hook React `useSystemNotifications` que encapsula uma lógica reutilizável.
+ * @returns {{ notifications: { id: string; type: string; title: string; message: string; timestamp: Date; actionLink: string | undefined; severity: "low" | "medium" | "high"; readAt: string | null | undefined; }[]; count: number; hasHighSeverity: boolean; markAsRead: UseMutateFunction<...>; markAllAsRead: UseMutateFunction<...>...} Retorna um valor do tipo `{ notifications: { id: string; type: string; title: string; message: string; timestamp: Date; actionLink: string | undefined; severity: "low" | "medium" | "high"; readAt: string | null | undefined; }[]; count: number; hasHighSeverity: boolean; markAsRead: UseMutateFunction<...>; markAllAsRead: UseMutateFunction<...>...`.
+ */
 export const useSystemNotifications = () => {
     const { user } = useAuth();
     const queryClient = useQueryClient();

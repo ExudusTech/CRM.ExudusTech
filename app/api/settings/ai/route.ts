@@ -24,6 +24,10 @@ const UpdateOrgAISettingsSchema = z
   })
   .strict();
 
+/**
+ * Handler HTTP `GET` deste endpoint (Next.js Route Handler).
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function GET() {
   const supabase = await createClient();
 
@@ -85,6 +89,12 @@ export async function GET() {
   });
 }
 
+/**
+ * Handler HTTP `POST` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function POST(req: Request) {
   // Mitigação CSRF: endpoint autenticado por cookies.
   if (!isAllowedOrigin(req)) {

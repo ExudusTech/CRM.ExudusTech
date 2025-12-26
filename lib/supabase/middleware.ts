@@ -1,6 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+/**
+ * Função pública `updateSession` do projeto.
+ *
+ * @param {NextRequest} request - Objeto da requisição.
+ * @returns {Promise<NextResponse<unknown>>} Retorna um valor do tipo `Promise<NextResponse<unknown>>`.
+ */
 export async function updateSession(request: NextRequest) {
     // NOTE: Apesar do nome do arquivo, esta função é consumida pelo `proxy.ts` (Next 16+).
     // O Next renomeou a convenção de `middleware.ts` -> `proxy.ts`.

@@ -32,6 +32,15 @@ const COLORS = {
     white: [255, 255, 255] as [number, number, number],
 };
 
+/**
+ * Função pública `generateReportPDF` do projeto.
+ *
+ * @param {ReportData} data - Parâmetro `data`.
+ * @param {PeriodFilter} period - Parâmetro `period`.
+ * @param {string | undefined} boardName - Parâmetro `boardName`.
+ * @param {string | undefined} generatedBy - Parâmetro `generatedBy`.
+ * @returns {void} Não retorna valor.
+ */
 export const generateReportPDF = (data: ReportData, period: PeriodFilter, boardName?: string, generatedBy?: string) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;

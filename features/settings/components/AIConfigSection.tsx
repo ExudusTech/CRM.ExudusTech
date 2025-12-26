@@ -127,6 +127,10 @@ async function validateApiKey(provider: string, apiKey: string, model: string): 
     }
 }
 
+/**
+ * Componente React `AIConfigSection`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AIConfigSection: React.FC = () => {
     const { profile } = useAuth();
     const isAdmin = profile?.role === 'admin';

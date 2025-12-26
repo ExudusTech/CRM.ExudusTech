@@ -81,6 +81,26 @@ function guessWonLostStageIds(stages: BoardStage[], opts?: { wonLabel?: string; 
 }
 
 
+/**
+ * Componente React `CreateBoardModal`.
+ *
+ * @param {CreateBoardModalProps} {
+  isOpen,
+  onClose,
+  onSave,
+  editingBoard,
+  availableBoards,
+  onSwitchEditingBoard,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSave,
+  editingBoard,
+  availableBoards,
+  onSwitchEditingBoard,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const CreateBoardModal: React.FC<CreateBoardModalProps> = ({
   isOpen,
   onClose,

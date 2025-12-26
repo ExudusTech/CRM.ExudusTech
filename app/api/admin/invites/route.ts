@@ -19,6 +19,10 @@ const CreateInviteSchema = z
   })
   .strict();
 
+/**
+ * Handler HTTP `GET` deste endpoint (Next.js Route Handler).
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function GET() {
   const supabase = await createClient();
 
@@ -51,6 +55,12 @@ export async function GET() {
   return json({ invites: invites || [] });
 }
 
+/**
+ * Handler HTTP `POST` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function POST(req: Request) {
   if (!isAllowedOrigin(req)) return json({ error: 'Forbidden' }, 403);
 

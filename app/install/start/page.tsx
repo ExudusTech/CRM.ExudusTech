@@ -25,6 +25,10 @@ const shouldShowTokenHelp = (message: string) => {
   return text.includes('vercel') && text.includes('token');
 };
 
+/**
+ * Componente React `InstallStartPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function InstallStartPage() {
   const router = useRouter();
   const [meta, setMeta] = useState<InstallerMeta | null>(null);

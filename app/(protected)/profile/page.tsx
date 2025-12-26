@@ -8,6 +8,10 @@ const ProfilePage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Profile`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Profile() {
     return <ProfilePage />
 }

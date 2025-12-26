@@ -28,6 +28,30 @@ interface StatCardProps {
     comparisonLabel?: string;
 }
 
+/**
+ * Componente React `StatCard`.
+ *
+ * @param {StatCardProps} {
+    title,
+    value,
+    subtext,
+    subtextPositive = true,
+    icon: Icon,
+    color,
+    onClick,
+    comparisonLabel = 'vs período anterior'
+} - Parâmetro `{
+    title,
+    value,
+    subtext,
+    subtextPositive = true,
+    icon: Icon,
+    color,
+    onClick,
+    comparisonLabel = 'vs período anterior'
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const StatCard: React.FC<StatCardProps> = ({
     title,
     value,

@@ -9,6 +9,10 @@ import { Decision, DecisionStats, SuggestedAction, ActionPayload } from '../type
 import decisionQueueService from '../services/decisionQueueService';
 import { runAllAnalyzers } from '../analyzers';
 
+/**
+ * Hook React `useDecisionQueue` que encapsula uma lógica reutilizável.
+ * @returns {{ decisions: Decision[]; stats: DecisionStats; lastAnalyzedAt: string | undefined; isAnalyzing: boolean; executingIds: Set<string>; runAnalyzers: () => Promise<{ ...; }>; ... 5 more ...; refreshDecisions: () => void; }} Retorna um valor do tipo `{ decisions: Decision[]; stats: DecisionStats; lastAnalyzedAt: string | undefined; isAnalyzing: boolean; executingIds: Set<string>; runAnalyzers: () => Promise<{ ...; }>; ... 5 more ...; refreshDecisions: () => void; }`.
+ */
 export function useDecisionQueue() {
   const { deals, activities, addActivity, updateActivity, updateDeal } = useCRM();
 

@@ -13,6 +13,12 @@ interface CreateDealModalV2Props {
   onClose: () => void;
 }
 
+/**
+ * Componente React `CreateDealModalV2`.
+ *
+ * @param {CreateDealModalV2Props} { isOpen, onClose } - Parâmetro `{ isOpen, onClose }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const CreateDealModalV2: React.FC<CreateDealModalV2Props> = ({ isOpen, onClose }) => {
   const { addDeal, activeBoard, activeBoardId } = useCRM();
 

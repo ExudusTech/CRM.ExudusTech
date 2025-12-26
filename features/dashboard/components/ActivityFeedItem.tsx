@@ -22,6 +22,12 @@ const ACTIVITY_FEED_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
     minute: '2-digit',
 });
 
+/**
+ * Componente React `ActivityFeedItem`.
+ *
+ * @param {ActivityFeedItemProps} { activity } - Parâmetro `{ activity }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({ activity }) => {
     // Smart Icon Logic: Corrigir visualmente inconsistências de dados legados/seed
     const titleLower = activity.title.toLowerCase();

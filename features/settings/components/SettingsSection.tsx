@@ -7,6 +7,12 @@ interface SettingsSectionProps {
   children: React.ReactNode;
 }
 
+/**
+ * Componente React `SettingsSection`.
+ *
+ * @param {SettingsSectionProps} { title, icon: Icon, children } - Parâmetro `{ title, icon: Icon, children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const SettingsSection: React.FC<SettingsSectionProps> = ({ title, icon: Icon, children }) => (
   <div className="glass rounded-xl border border-slate-200 dark:border-white/5 shadow-sm p-6 mb-6">
     <div className="flex items-center gap-4 mb-6 border-b border-slate-100 dark:border-white/5 pb-4">

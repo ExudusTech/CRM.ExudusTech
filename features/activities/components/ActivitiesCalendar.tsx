@@ -12,6 +12,22 @@ interface ActivitiesCalendarProps {
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 9); // 9:00 to 18:00
 const DAYS_OF_WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+/**
+ * Componente React `ActivitiesCalendar`.
+ *
+ * @param {ActivitiesCalendarProps} {
+    activities,
+    deals,
+    currentDate,
+    setCurrentDate
+} - Parâmetro `{
+    activities,
+    deals,
+    currentDate,
+    setCurrentDate
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesCalendar: React.FC<ActivitiesCalendarProps> = ({
     activities,
     deals,

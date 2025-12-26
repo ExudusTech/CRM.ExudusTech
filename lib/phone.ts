@@ -40,6 +40,12 @@ export function normalizePhoneE164(
   return raw;
 }
 
+/**
+ * Função pública `isE164` do projeto.
+ *
+ * @param {string | null | undefined} input - Parâmetro `input`.
+ * @returns {boolean} Retorna um valor do tipo `boolean`.
+ */
 export function isE164(input?: string | null): boolean {
   const value = (input ?? '').trim();
   return /^\+[1-9]\d{1,14}$/.test(value);

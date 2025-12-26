@@ -792,6 +792,12 @@ const CRMInnerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 // MAIN PROVIDER (Composes all providers)
 // ============================================
 
+/**
+ * Componente React `CRMProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const CRMProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <SettingsProvider>
@@ -812,6 +818,10 @@ export const CRMProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 // LEGACY HOOK (Backward Compatible)
 // ============================================
 
+/**
+ * Hook React `useCRM` que encapsula uma lógica reutilizável.
+ * @returns {CRMContextType} Retorna um valor do tipo `CRMContextType`.
+ */
 export const useCRM = () => {
   const context = useContext(CRMContext);
   if (context === undefined) {

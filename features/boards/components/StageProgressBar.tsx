@@ -14,6 +14,24 @@ interface StageProgressBarProps {
     className?: string;
 }
 
+/**
+ * Componente React `StageProgressBar`.
+ *
+ * @param {StageProgressBarProps} {
+    stages,
+    currentStatus,
+    onStageClick,
+    variant = 'segmented',
+    className,
+} - Parâmetro `{
+    stages,
+    currentStatus,
+    onStageClick,
+    variant = 'segmented',
+    className,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const StageProgressBar: React.FC<StageProgressBarProps> = ({
     stages,
     currentStatus,

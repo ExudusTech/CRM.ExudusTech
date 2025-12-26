@@ -29,6 +29,32 @@ const typeConfig = {
     TASK: { label: 'Tarefa', icon: Clock, color: 'orange' },
 };
 
+/**
+ * Componente React `ScheduleModal`.
+ *
+ * @param {ScheduleModalProps} {
+    isOpen,
+    onClose,
+    onSave,
+    contactName = 'Contato',
+    initialType = 'CALL',
+    initialTitle,
+    initialDescription,
+    initialDate,
+    initialTime,
+} - Parâmetro `{
+    isOpen,
+    onClose,
+    onSave,
+    contactName = 'Contato',
+    initialType = 'CALL',
+    initialTitle,
+    initialDescription,
+    initialDate,
+    initialTime,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export function ScheduleModal({
     isOpen,
     onClose,

@@ -1,3 +1,9 @@
+/**
+ * Função pública `getErrorMessage` do projeto.
+ *
+ * @param {unknown} error - Parâmetro `error`.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export const getErrorMessage = (error: unknown): string => {
     if (!error) return 'Ocorreu um erro desconhecido.';
 

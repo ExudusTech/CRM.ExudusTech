@@ -108,6 +108,12 @@ interface SettingsPageProps {
   tab?: SettingsTab;
 }
 
+/**
+ * Componente React `SettingsPage`.
+ *
+ * @param {SettingsPageProps} { tab: initialTab } - Parâmetro `{ tab: initialTab }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 const SettingsPage: React.FC<SettingsPageProps> = ({ tab: initialTab }) => {
   const { profile } = useAuth();
   const pathname = usePathname();

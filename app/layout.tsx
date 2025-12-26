@@ -9,6 +9,16 @@ export const metadata: Metadata = {
   description: 'CRM Inteligente para Gestão de Vendas',
 }
 
+/**
+ * Componente React `RootLayout`.
+ *
+ * @param {{ children: ReactNode; }} {
+  children,
+} - Parâmetro `{
+  children,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function RootLayout({
   children,
 }: {

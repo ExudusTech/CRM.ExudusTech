@@ -8,6 +8,22 @@ interface ContactsTabsProps {
     companiesCount: number;
 }
 
+/**
+ * Componente React `ContactsTabs`.
+ *
+ * @param {ContactsTabsProps} {
+    viewMode,
+    setViewMode,
+    contactsCount,
+    companiesCount
+} - Parâmetro `{
+    viewMode,
+    setViewMode,
+    contactsCount,
+    companiesCount
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsTabs: React.FC<ContactsTabsProps> = ({
     viewMode,
     setViewMode,

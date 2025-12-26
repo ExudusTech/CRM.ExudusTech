@@ -19,6 +19,12 @@ export function getExpectedOrigin(req: Request): string | null {
   return `${proto}://${host}`;
 }
 
+/**
+ * Função pública `isAllowedOrigin` do projeto.
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {boolean} Retorna um valor do tipo `boolean`.
+ */
 export function isAllowedOrigin(req: Request): boolean {
   const origin = req.headers.get('origin');
   if (!origin) return true;

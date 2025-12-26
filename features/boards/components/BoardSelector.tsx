@@ -11,6 +11,26 @@ interface BoardSelectorProps {
   onDeleteBoard?: (id: string) => void;
 }
 
+/**
+ * Componente React `BoardSelector`.
+ *
+ * @param {BoardSelectorProps} {
+  boards,
+  activeBoard,
+  onSelectBoard,
+  onCreateBoard,
+  onEditBoard,
+  onDeleteBoard,
+} - Parâmetro `{
+  boards,
+  activeBoard,
+  onSelectBoard,
+  onCreateBoard,
+  onEditBoard,
+  onDeleteBoard,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const BoardSelector: React.FC<BoardSelectorProps> = ({
   boards,
   activeBoard,

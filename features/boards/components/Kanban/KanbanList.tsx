@@ -94,6 +94,28 @@ interface KanbanListProps {
   ) => void;
 }
 
+/**
+ * Componente React `KanbanList`.
+ *
+ * @param {KanbanListProps} {
+  stages,
+  filteredDeals,
+  customFieldDefinitions,
+  setSelectedDealId,
+  openActivityMenuId,
+  setOpenActivityMenuId,
+  handleQuickAddActivity,
+} - Parâmetro `{
+  stages,
+  filteredDeals,
+  customFieldDefinitions,
+  setSelectedDealId,
+  openActivityMenuId,
+  setOpenActivityMenuId,
+  handleQuickAddActivity,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const KanbanList: React.FC<KanbanListProps> = ({
   stages,
   filteredDeals,

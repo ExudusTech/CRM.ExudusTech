@@ -203,6 +203,10 @@ function TabButton({ active, children, onClick }: { active: boolean; children: R
   );
 }
 
+/**
+ * Componente React `DealCockpitMockClient`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function DealCockpitMockClient() {
   const [tab, setTab] = React.useState<Tab>('chat');
   const [query, setQuery] = React.useState('');

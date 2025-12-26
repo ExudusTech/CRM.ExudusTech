@@ -109,6 +109,12 @@ async function vercelFetch<T>(
   return JSON.parse(text) as T;
 }
 
+/**
+ * Função pública `listVercelTeams` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @returns {Promise<VercelTeam[]>} Retorna um valor do tipo `Promise<VercelTeam[]>`.
+ */
 export async function listVercelTeams(token: string): Promise<VercelTeam[]> {
   const data = await vercelFetch<{ teams?: VercelTeam[] }>(
     '/v2/teams',
@@ -117,6 +123,13 @@ export async function listVercelTeams(token: string): Promise<VercelTeam[]> {
   return data.teams ?? [];
 }
 
+/**
+ * Função pública `listVercelProjects` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @param {string | undefined} teamId - Identificador do recurso.
+ * @returns {Promise<VercelProject[]>} Retorna um valor do tipo `Promise<VercelProject[]>`.
+ */
 export async function listVercelProjects(
   token: string,
   teamId?: string
@@ -179,6 +192,15 @@ async function createEnv(
   );
 }
 
+/**
+ * Função pública `upsertProjectEnvs` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @param {string} projectId - Identificador do recurso.
+ * @param {{ key: string; value: string; targets: string[]; }[]} envs - Parâmetro `envs`.
+ * @param {string | undefined} teamId - Identificador do recurso.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export async function upsertProjectEnvs(
   token: string,
   projectId: string,
@@ -218,6 +240,14 @@ export async function upsertProjectEnvs(
   }
 }
 
+/**
+ * Função pública `triggerProjectRedeploy` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @param {string} projectId - Identificador do recurso.
+ * @param {string | undefined} teamId - Identificador do recurso.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export async function triggerProjectRedeploy(
   token: string,
   projectId: string,
@@ -244,6 +274,12 @@ export async function triggerProjectRedeploy(
   );
 }
 
+/**
+ * Função pública `validateVercelToken` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @returns {Promise<{ ok: true; userId: string; } | { ok: false; error: string; }>} Retorna um valor do tipo `Promise<{ ok: true; userId: string; } | { ok: false; error: string; }>`.
+ */
 export async function validateVercelToken(
   token: string
 ): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
@@ -260,6 +296,14 @@ export async function validateVercelToken(
   }
 }
 
+/**
+ * Função pública `getProject` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @param {string} projectId - Identificador do recurso.
+ * @param {string | undefined} teamId - Identificador do recurso.
+ * @returns {Promise<{ ok: true; project: VercelProject; } | { ok: false; error: string; }>} Retorna um valor do tipo `Promise<{ ok: true; project: VercelProject; } | { ok: false; error: string; }>`.
+ */
 export async function getProject(
   token: string,
   projectId: string,
@@ -282,6 +326,13 @@ export async function getProject(
   }
 }
 
+/**
+ * Função pública `findProjectByDomain` do projeto.
+ *
+ * @param {string} token - Parâmetro `token`.
+ * @param {string} domain - Parâmetro `domain`.
+ * @returns {Promise<{ ok: true; project: VercelProject; } | { ok: false; error: string; }>} Retorna um valor do tipo `Promise<{ ok: true; project: VercelProject; } | { ok: false; error: string; }>`.
+ */
 export async function findProjectByDomain(
   token: string,
   domain: string

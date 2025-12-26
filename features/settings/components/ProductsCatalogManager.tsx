@@ -11,6 +11,10 @@ function formatBRL(v: number) {
   }
 }
 
+/**
+ * Componente React `ProductsCatalogManager`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ProductsCatalogManager: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);

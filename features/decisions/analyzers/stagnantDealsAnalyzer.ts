@@ -169,6 +169,14 @@ function generateAlternativeActions(deal: DealView): SuggestedAction[] {
   ];
 }
 
+/**
+ * Função pública `analyzeStagnantDeals` do projeto.
+ *
+ * @param {DealView[]} deals - Parâmetro `deals`.
+ * @param {Activity[]} activities - Parâmetro `activities`.
+ * @param {AnalyzerConfig} config - Parâmetro `config`.
+ * @returns {AnalyzerResult} Retorna um valor do tipo `AnalyzerResult`.
+ */
 export function analyzeStagnantDeals(
   deals: DealView[],
   activities: Activity[],

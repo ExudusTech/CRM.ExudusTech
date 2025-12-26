@@ -22,6 +22,26 @@ interface ContactFormModalProps {
   editingContact: Contact | null;
 }
 
+/**
+ * Componente React `ContactFormModal`.
+ *
+ * @param {ContactFormModalProps} {
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
+  editingContact,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
+  editingContact,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const ContactFormModal: React.FC<ContactFormModalProps> = ({
   isOpen,
   onClose,
@@ -53,6 +73,10 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
+        onClick={(e) => {
+          // Close only when clicking the backdrop (outside the panel).
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
         <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
           <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">

@@ -18,6 +18,26 @@ export interface CallLogData {
     title: string;
 }
 
+/**
+ * Componente React `CallModal`.
+ *
+ * @param {CallModalProps} {
+    isOpen,
+    onClose,
+    onSave,
+    contactName,
+    contactPhone,
+    suggestedTitle = 'Ligação'
+} - Parâmetro `{
+    isOpen,
+    onClose,
+    onSave,
+    contactName,
+    contactPhone,
+    suggestedTitle = 'Ligação'
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const CallModal: React.FC<CallModalProps> = ({
     isOpen,
     onClose,

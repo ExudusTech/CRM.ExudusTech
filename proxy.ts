@@ -22,6 +22,12 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+/**
+ * Função pública `proxy` do projeto.
+ *
+ * @param {NextRequest} request - Objeto da requisição.
+ * @returns {Promise<NextResponse<unknown>>} Retorna um valor do tipo `Promise<NextResponse<unknown>>`.
+ */
 export async function proxy(request: NextRequest) {
     return await updateSession(request)
 }

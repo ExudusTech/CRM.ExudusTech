@@ -52,6 +52,36 @@ const sizeClasses = {
   xl: 'max-w-xl',
 };
 
+/**
+ * Componente React `Modal`.
+ *
+ * @param {ModalProps} { 
+  isOpen, 
+  onClose, 
+  title, 
+  children, 
+  size = 'md',
+  className,
+  bodyClassName,
+  labelledById,
+  describedById,
+  initialFocus,
+  focusTrapEnabled = true,
+} - Parâmetro `{ 
+  isOpen, 
+  onClose, 
+  title, 
+  children, 
+  size = 'md',
+  className,
+  bodyClassName,
+  labelledById,
+  describedById,
+  initialFocus,
+  focusTrapEnabled = true,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const Modal: React.FC<ModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -144,6 +174,12 @@ interface ModalFormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   children: React.ReactNode;
 }
 
+/**
+ * Componente React `ModalForm`.
+ *
+ * @param {ModalFormProps} { children, className, ...props } - Parâmetro `{ children, className, ...props }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ModalForm: React.FC<ModalFormProps> = ({ children, className, ...props }) => (
   <form className={cn('space-y-4', className)} {...props}>
     {children}

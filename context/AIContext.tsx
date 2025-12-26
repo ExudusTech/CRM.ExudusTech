@@ -13,6 +13,12 @@ interface AIContextType {
 
 const AIContext = createContext<AIContextType | undefined>(undefined);
 
+/**
+ * Componente React `AIProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user, profile } = useAuth();
     const [activeContext, setActiveContextState] = useState<CallOptions | null>(null);
@@ -71,6 +77,10 @@ export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     );
 };
 
+/**
+ * Hook React `useAI` que encapsula uma lógica reutilizável.
+ * @returns {AIContextType} Retorna um valor do tipo `AIContextType`.
+ */
 export const useAI = () => {
     const context = useContext(AIContext);
     if (context === undefined) {

@@ -22,6 +22,12 @@ const STAGE_COLORS = [
     'bg-slate-500',
 ];
 
+/**
+ * Componente React `LifecycleSettingsModal`.
+ *
+ * @param {LifecycleSettingsModalProps} { isOpen, onClose } - Parâmetro `{ isOpen, onClose }`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const LifecycleSettingsModal: React.FC<LifecycleSettingsModalProps> = ({ isOpen, onClose }) => {
     const headingId = useId();
     useFocusReturn({ enabled: isOpen });

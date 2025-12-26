@@ -23,6 +23,10 @@ function formatChange(value: number): { text: string; isPositive: boolean } {
   };
 }
 
+/**
+ * Componente React `DashboardPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 const DashboardPage: React.FC = () => {
   const router = useRouter();
   const { activities, lifecycleStages, contacts, boards } = useCRM();
@@ -143,7 +147,7 @@ const DashboardPage: React.FC = () => {
           subtextPositive={pipelineChangeInfo.isPositive}
           icon={DollarSign}
           color="bg-blue-500"
-          onClick={() => router.push('/pipeline')}
+          onClick={() => router.push('/boards')}
           comparisonLabel={COMPARISON_LABELS[period]}
         />
         <StatCard
@@ -153,7 +157,7 @@ const DashboardPage: React.FC = () => {
           subtextPositive={dealsChangeInfo.isPositive}
           icon={Users}
           color="bg-purple-500"
-          onClick={() => router.push('/pipeline?status=open')}
+          onClick={() => router.push('/boards?status=open')}
           comparisonLabel={COMPARISON_LABELS[period]}
         />
         <StatCard
@@ -173,7 +177,7 @@ const DashboardPage: React.FC = () => {
           subtextPositive={revenueChangeInfo.isPositive}
           icon={TrendingUp}
           color="bg-orange-500"
-          onClick={() => router.push('/pipeline?status=won&view=list')}
+          onClick={() => router.push('/boards?status=won&view=list')}
           comparisonLabel={COMPARISON_LABELS[period]}
         />
       </div>

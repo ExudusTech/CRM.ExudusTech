@@ -8,6 +8,10 @@ import { ActivityFormModal } from './components/ActivityFormModal';
 import { BulkActionsToolbar } from './components/BulkActionsToolbar';
 import { useToast } from '@/context/ToastContext';
 
+/**
+ * Componente React `ActivitiesPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesPage: React.FC = () => {
     const {
         viewMode,

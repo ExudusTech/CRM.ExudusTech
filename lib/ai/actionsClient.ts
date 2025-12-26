@@ -29,6 +29,14 @@ export type AnalyzeLeadResult = {
   suggestion: string;
 };
 
+/**
+ * Função pública `analyzeLead` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @param {string | undefined} stageLabel - Parâmetro `stageLabel`.
+ * @returns {Promise<AnalyzeLeadResult>} Retorna um valor do tipo `Promise<AnalyzeLeadResult>`.
+ */
 export async function analyzeLead(
   deal: Deal | DealView,
   _config?: AIConfigLegacy,
@@ -88,6 +96,14 @@ export async function analyzeLead(
   }
 }
 
+/**
+ * Função pública `generateEmailDraft` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @param {string | undefined} stageLabel - Parâmetro `stageLabel`.
+ * @returns {Promise<string>} Retorna um valor do tipo `Promise<string>`.
+ */
 export async function generateEmailDraft(
   deal: Deal | DealView,
   _config?: AIConfigLegacy,
@@ -112,6 +128,14 @@ export async function generateEmailDraft(
   }
 }
 
+/**
+ * Função pública `generateObjectionResponse` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {string} objection - Parâmetro `objection`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @returns {Promise<string[]>} Retorna um valor do tipo `Promise<string[]>`.
+ */
 export async function generateObjectionResponse(
   deal: Deal | DealView,
   objection: string,
@@ -158,6 +182,14 @@ export interface GeneratedBoard {
   linkedLifecycleStage?: string;
 }
 
+/**
+ * Função pública `generateBoardStructure` do projeto.
+ *
+ * @param {string} description - Parâmetro `description`.
+ * @param {LifecycleStage[]} lifecycleStages - Parâmetro `lifecycleStages`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @returns {Promise<{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }>} Retorna um valor do tipo `Promise<{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }>`.
+ */
 export async function generateBoardStructure(
   description: string,
   lifecycleStages: LifecycleStage[] = [],
@@ -174,6 +206,13 @@ export async function generateBoardStructure(
   });
 }
 
+/**
+ * Função pública `generateBoardStrategy` do projeto.
+ *
+ * @param {{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }} boardData - Parâmetro `boardData`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @returns {Promise<Pick<GeneratedBoard, "goal" | "agentPersona" | "entryTrigger">>} Retorna um valor do tipo `Promise<Pick<GeneratedBoard, "goal" | "agentPersona" | "entryTrigger">>`.
+ */
 export async function generateBoardStrategy(
   boardData: {
     boardName: string;
@@ -195,6 +234,15 @@ export async function generateBoardStrategy(
   }
 }
 
+/**
+ * Função pública `refineBoardWithAI` do projeto.
+ *
+ * @param {GeneratedBoard} currentBoard - Parâmetro `currentBoard`.
+ * @param {string} userInstruction - Parâmetro `userInstruction`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @param {{ role: "user" | "ai"; content: string; }[] | undefined} chatHistory - Parâmetro `chatHistory`.
+ * @returns {Promise<{ message: string; board: GeneratedBoard | null; }>} Retorna um valor do tipo `Promise<{ message: string; board: GeneratedBoard | null; }>`.
+ */
 export async function refineBoardWithAI(
   currentBoard: GeneratedBoard,
   userInstruction: string,
@@ -221,6 +269,12 @@ export async function refineBoardWithAI(
   return result;
 }
 
+/**
+ * Função pública `parseNaturalLanguageAction` do projeto.
+ *
+ * @param {string} text - Parâmetro `text`.
+ * @returns {Promise<ParsedAction>} Retorna um valor do tipo `Promise<ParsedAction>`.
+ */
 export async function parseNaturalLanguageAction(text: string): Promise<ParsedAction> {
   return await callAIProxy<ParsedAction>('parseNaturalLanguageAction', { text });
 }
@@ -243,6 +297,13 @@ export type RewriteMessageDraftResult = {
   message: string;
 };
 
+/**
+ * Função pública `rewriteMessageDraft` do projeto.
+ *
+ * @param {RewriteMessageDraftInput} input - Parâmetro `input`.
+ * @param {AIConfigLegacy | undefined} _config - Parâmetro `_config`.
+ * @returns {Promise<RewriteMessageDraftResult>} Retorna um valor do tipo `Promise<RewriteMessageDraftResult>`.
+ */
 export async function rewriteMessageDraft(
   input: RewriteMessageDraftInput,
   _config?: AIConfigLegacy

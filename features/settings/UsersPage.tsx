@@ -41,6 +41,10 @@ const getAvatarProps = (email: string) => {
 // Valida formato de email
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+/**
+ * Componente React `UsersPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const UsersPage: React.FC = () => {
     const { profile: currentUserProfile } = useAuth();
     const { addToast } = useToast();
@@ -398,7 +402,13 @@ export const UsersPage: React.FC = () => {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+                    onClick={(e) => {
+                        // Close only when clicking the backdrop (outside the panel).
+                        if (e.target === e.currentTarget) closeModal();
+                    }}
+                >
                     <div
                         className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}

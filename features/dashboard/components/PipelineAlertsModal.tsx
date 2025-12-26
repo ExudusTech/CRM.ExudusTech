@@ -19,6 +19,24 @@ interface PipelineAlertsModalProps {
   onNavigateToDeal: (dealId: string) => void;
 }
 
+/**
+ * Componente React `PipelineAlertsModal`.
+ *
+ * @param {PipelineAlertsModalProps} {
+  isOpen,
+  onClose,
+  deals,
+  activities,
+  onNavigateToDeal,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  deals,
+  activities,
+  onNavigateToDeal,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const PipelineAlertsModal: React.FC<PipelineAlertsModalProps> = ({
   isOpen,
   onClose,

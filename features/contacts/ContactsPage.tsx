@@ -10,11 +10,17 @@ import { ContactsList } from './components/ContactsList';
 import { ContactFormModal } from './components/ContactFormModal';
 import { SelectBoardModal } from './components/SelectBoardModal';
 import { PaginationControls } from './components/PaginationControls';
+import { ContactsImportExportModal } from './components/ContactsImportExportModal';
 import ConfirmModal from '@/components/ConfirmModal';
 
+/**
+ * Componente React `ContactsPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsPage: React.FC = () => {
     const controller = useContactsController();
     const router = useRouter();
+    const [isImportExportOpen, setIsImportExportOpen] = React.useState(false);
 
     const goToDeal = (dealId: string) => {
         controller.setDeleteWithDeals(null);
@@ -32,6 +38,21 @@ export const ContactsPage: React.FC = () => {
                 isFilterOpen={controller.isFilterOpen}
                 setIsFilterOpen={controller.setIsFilterOpen}
                 openCreateModal={controller.openCreateModal}
+                openImportExportModal={() => setIsImportExportOpen(true)}
+            />
+
+            <ContactsImportExportModal
+                isOpen={isImportExportOpen}
+                onClose={() => setIsImportExportOpen(false)}
+                exportParams={{
+                    search: controller.search?.trim() ? controller.search.trim() : undefined,
+                    stage: controller.stageFilter,
+                    status: controller.statusFilter,
+                    dateStart: controller.dateRange?.start || undefined,
+                    dateEnd: controller.dateRange?.end || undefined,
+                    sortBy: controller.sortBy,
+                    sortOrder: controller.sortOrder,
+                }}
             />
 
             {controller.isFilterOpen && (

@@ -51,6 +51,13 @@ export const phoneSchema = z
   .transform(val => normalizePhoneE164(val))
   .refine(val => val === '' || isE164(val), msg('PHONE_INVALID'));
 
+/**
+ * Função pública `requiredString` do projeto.
+ *
+ * @param {string} field - Parâmetro `field`.
+ * @param {number} maxLength - Parâmetro `maxLength`.
+ * @returns {ZodString} Retorna um valor do tipo `ZodString`.
+ */
 export const requiredString = (field: string, maxLength: number = MAX_LENGTHS.NAME) =>
   z.string({ message: msg('FIELD_REQUIRED', { field }) })
     .min(1, msg('FIELD_REQUIRED', { field }))
@@ -75,12 +82,24 @@ export const currencySchema = z.coerce
   .optional()
   .transform(val => val ?? 0);
 
+/**
+ * Função pública `requiredSelect` do projeto.
+ *
+ * @param {string} field - Parâmetro `field`.
+ * @returns {ZodString} Retorna um valor do tipo `ZodString`.
+ */
 export const requiredSelect = (field: string) =>
   z
     .string({ message: msg('SELECTION_REQUIRED', { field }) })
     .min(1, msg('SELECTION_REQUIRED', { field }))
     .max(100, 'Seleção inválida');
 
+/**
+ * Função pública `requiredDate` do projeto.
+ *
+ * @param {string} field - Parâmetro `field`.
+ * @returns {ZodString} Retorna um valor do tipo `ZodString`.
+ */
 export const requiredDate = (field: string) =>
   z.string({ message: msg('DATE_REQUIRED', { field }) })
     .min(1, msg('DATE_REQUIRED', { field }))

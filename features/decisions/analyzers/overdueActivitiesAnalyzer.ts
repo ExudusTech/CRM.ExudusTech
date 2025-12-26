@@ -119,6 +119,14 @@ function generateSuggestedActions(activity: Activity, deal?: DealView): {
   return { primary, alternatives };
 }
 
+/**
+ * Função pública `analyzeOverdueActivities` do projeto.
+ *
+ * @param {Activity[]} activities - Parâmetro `activities`.
+ * @param {DealView[]} deals - Parâmetro `deals`.
+ * @param {AnalyzerConfig} config - Parâmetro `config`.
+ * @returns {AnalyzerResult} Retorna um valor do tipo `AnalyzerResult`.
+ */
 export function analyzeOverdueActivities(
   activities: Activity[],
   deals: DealView[],

@@ -574,6 +574,12 @@ function buildSuggestedEmailBody(opts: {
   );
 }
 
+/**
+ * Componente React `DealCockpitClient`.
+ *
+ * @param {{ dealId?: string | undefined; }} { dealId } - Parâmetro `{ dealId }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function DealCockpitClient({ dealId }: { dealId?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();

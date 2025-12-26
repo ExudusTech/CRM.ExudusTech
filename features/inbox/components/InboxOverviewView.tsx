@@ -116,6 +116,38 @@ const SuggestionMiniRow: React.FC<{
   );
 };
 
+/**
+ * Componente React `InboxOverviewView`.
+ *
+ * @param {InboxOverviewViewProps} {
+  overdueActivities,
+  todayMeetings,
+  todayTasks,
+  upcomingActivities,
+  aiSuggestions,
+  onGoToList,
+  onStartFocus,
+  onAcceptSuggestion,
+  onOpenOverdue,
+  onOpenToday,
+  onOpenCriticalSuggestions,
+  onOpenPending,
+} - Parâmetro `{
+  overdueActivities,
+  todayMeetings,
+  todayTasks,
+  upcomingActivities,
+  aiSuggestions,
+  onGoToList,
+  onStartFocus,
+  onAcceptSuggestion,
+  onOpenOverdue,
+  onOpenToday,
+  onOpenCriticalSuggestions,
+  onOpenPending,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InboxOverviewView: React.FC<InboxOverviewViewProps> = ({
   overdueActivities,
   todayMeetings,

@@ -7,6 +7,10 @@ import { getErrorMessage } from '@/utils/errorUtils'
 import { useAuth } from '@/context/AuthContext'
 import { Loader2, Building2, User, Lock, ArrowRight } from 'lucide-react'
 
+/**
+ * Componente React `SetupPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function SetupPage() {
   const [companyName, setCompanyName] = useState('')
   const [email, setEmail] = useState('')

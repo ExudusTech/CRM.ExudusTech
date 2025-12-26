@@ -8,6 +8,10 @@ const DecisionQueuePage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Decisions`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Decisions() {
     return <DecisionQueuePage />
 }

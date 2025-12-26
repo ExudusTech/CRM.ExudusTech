@@ -6,6 +6,10 @@ import { InboxOverviewView } from './components/InboxOverviewView';
 import { InboxListView } from './components/InboxListView';
 import { InboxFocusView } from './components/InboxFocusView';
 
+/**
+ * Componente React `InboxPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InboxPage: React.FC = () => {
   const router = useRouter();
 

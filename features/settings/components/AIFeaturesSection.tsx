@@ -24,6 +24,10 @@ const FEATURES: FeatureItem[] = [
   { key: 'ai_board_refine', title: 'Boards: refinar com IA', description: 'Refina o board via chat/instruções.' },
 ];
 
+/**
+ * Componente React `AIFeaturesSection`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AIFeaturesSection: React.FC = () => {
   const { profile } = useAuth();
   const isAdmin = profile?.role === 'admin';

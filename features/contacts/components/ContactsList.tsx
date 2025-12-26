@@ -89,6 +89,44 @@ interface ContactsListProps {
     onSort?: (column: ContactSortableColumn) => void;
 }
 
+/**
+ * Componente React `ContactsList`.
+ *
+ * @param {ContactsListProps} {
+    viewMode,
+    filteredContacts,
+    filteredCompanies,
+    contacts,
+    selectedIds,
+    toggleSelect,
+    toggleSelectAll,
+    getCompanyName,
+    updateContact,
+    convertContactToDeal,
+    openEditModal,
+    setDeleteId,
+    sortBy = 'created_at',
+    sortOrder = 'desc',
+    onSort,
+} - Parâmetro `{
+    viewMode,
+    filteredContacts,
+    filteredCompanies,
+    contacts,
+    selectedIds,
+    toggleSelect,
+    toggleSelectAll,
+    getCompanyName,
+    updateContact,
+    convertContactToDeal,
+    openEditModal,
+    setDeleteId,
+    sortBy = 'created_at',
+    sortOrder = 'desc',
+    onSort,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsList: React.FC<ContactsListProps> = ({
     viewMode,
     filteredContacts,

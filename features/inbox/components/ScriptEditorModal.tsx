@@ -39,6 +39,24 @@ const ICONS = [
     { value: 'RefreshCw', icon: RefreshCw, label: 'Refresh' },
 ];
 
+/**
+ * Componente React `ScriptEditorModal`.
+ *
+ * @param {ScriptEditorModalProps} {
+    isOpen,
+    onClose,
+    onSave,
+    initialData,
+    previewVariables = { nome: 'Cliente', empresa: 'Empresa' }
+} - Parâmetro `{
+    isOpen,
+    onClose,
+    onSave,
+    initialData,
+    previewVariables = { nome: 'Cliente', empresa: 'Empresa' }
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export function ScriptEditorModal({
     isOpen,
     onClose,

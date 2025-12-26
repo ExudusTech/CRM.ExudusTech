@@ -12,6 +12,28 @@ interface ActivitiesListProps {
     onSelectActivity?: (id: string, selected: boolean) => void;
 }
 
+/**
+ * Componente React `ActivitiesList`.
+ *
+ * @param {ActivitiesListProps} {
+    activities,
+    deals,
+    onToggleComplete,
+    onEdit,
+    onDelete,
+    selectedActivities = new Set(),
+    onSelectActivity
+} - Parâmetro `{
+    activities,
+    deals,
+    onToggleComplete,
+    onEdit,
+    onDelete,
+    selectedActivities = new Set(),
+    onSelectActivity
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesList: React.FC<ActivitiesListProps> = ({
     activities,
     deals,

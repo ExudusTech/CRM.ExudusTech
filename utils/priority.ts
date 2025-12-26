@@ -32,6 +32,12 @@ export function formatPriorityPtBr(priority: string | null | undefined): string 
   }
 }
 
+/**
+ * Função pública `priorityAriaLabelPtBr` do projeto.
+ *
+ * @param {string | null | undefined} priority - Parâmetro `priority`.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export function priorityAriaLabelPtBr(priority: string | null | undefined): string {
   const label = formatPriorityPtBr(priority);
   if (!label) return '';

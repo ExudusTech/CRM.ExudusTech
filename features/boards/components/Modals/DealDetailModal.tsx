@@ -7,6 +7,7 @@ import { LossReasonModal } from '@/components/ui/LossReasonModal';
 import { useMoveDealSimple } from '@/lib/query/hooks';
 import { FocusTrap, useFocusReturn } from '@/lib/a11y';
 import { Activity } from '@/types';
+import { usePersistedState } from '@/hooks/usePersistedState';
 import {
   analyzeLead,
   generateEmailDraft,
@@ -29,6 +30,8 @@ import {
   Sword,
   CheckCircle2,
   Bot,
+  Tag as TagIcon,
+  Plus,
 } from 'lucide-react';
 import { StageProgressBar } from '../StageProgressBar';
 import { ActivityRow } from '@/features/activities/components/ActivityRow';
@@ -43,6 +46,12 @@ interface DealDetailModalProps {
 // Performance: reuse date formatter instance.
 const PT_BR_DATE_FORMATTER = new Intl.DateTimeFormat('pt-BR');
 
+/**
+ * Componente React `DealDetailModal`.
+ *
+ * @param {DealDetailModalProps} { dealId, isOpen, onClose } - Parâmetro `{ dealId, isOpen, onClose }`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen, onClose }) => {
   // Accessibility: Unique ID for ARIA labelling
   const headingId = useId();
@@ -116,6 +125,14 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const [pendingLostStageId, setPendingLostStageId] = useState<string | null>(null);
   const [lossReasonOrigin, setLossReasonOrigin] = useState<'button' | 'stage'>('button');
 
+  // Tags suggestions (local for now; Settings UI writes to the same key)
+  const [availableTags, setAvailableTags] = usePersistedState<string[]>('crm_tags', []);
+  const [tagQuery, setTagQuery] = useState('');
+
+  const normalizeTag = (value: string) => value.trim().replace(/\s+/g, ' ');
+  const tagsLower = useMemo(() => new Set((deal?.tags || []).map(t => t.toLowerCase())), [deal?.tags]);
+  const availableTagsLower = useMemo(() => new Set((availableTags || []).map(t => t.toLowerCase())), [availableTags]);
+
   // Helper functions removed as they are now handled by ActivityRow component
 
   // Reset state when deal changes or modal opens
@@ -133,6 +150,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
       setShowLossReasonModal(false);
       setPendingLostStageId(null);
       setLossReasonOrigin('button');
+      setTagQuery('');
     }
   }, [isOpen, dealId]); // Depend on dealId to reset when switching deals
 
@@ -164,6 +182,39 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   }, [activities, deal]);
 
   if (!isOpen || !deal) return null;
+
+  const addDealTag = (raw: string) => {
+    const next = normalizeTag(raw);
+    if (!next) return;
+    if (tagsLower.has(next.toLowerCase())) return;
+
+    const current = deal.tags || [];
+    const nextTags = [...current, next];
+    updateDeal(deal.id, { tags: nextTags });
+
+    // Keep suggestions up-to-date (case-insensitive)
+    if (!availableTagsLower.has(next.toLowerCase())) {
+      setAvailableTags(prev => [...(prev || []), next]);
+    }
+
+    setTagQuery('');
+  };
+
+  const removeDealTag = (tag: string) => {
+    const current = deal.tags || [];
+    const nextTags = current.filter(t => t !== tag);
+    updateDeal(deal.id, { tags: nextTags });
+  };
+
+  const tagSuggestions = (() => {
+    const q = normalizeTag(tagQuery);
+    if (!q) return [];
+    const qLower = q.toLowerCase();
+    return (availableTags || [])
+      .filter(t => !tagsLower.has(t.toLowerCase()))
+      .filter(t => t.toLowerCase().includes(qLower))
+      .slice(0, 8);
+  })();
 
   const handleAnalyzeDeal = async () => {
     setIsAnalyzing(true);
@@ -602,6 +653,84 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
                       <span className="text-slate-500">Probabilidade</span>
                       <span className="text-slate-900 dark:text-white">{deal.probability}%</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* TAGS */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/5">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
+                    <TagIcon size={14} /> Tags
+                  </h3>
+
+                  <div className="flex flex-wrap gap-2">
+                    {(deal.tags || []).length === 0 ? (
+                      <p className="text-xs text-slate-500 italic">Sem tags.</p>
+                    ) : (
+                      (deal.tags || []).map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeDealTag(tag)}
+                            className="ml-0.5 text-slate-400 hover:text-red-500 dark:hover:text-red-400"
+                            aria-label={`Remover tag ${tag}`}
+                            title="Remover tag"
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                      Adicionar tag
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={tagQuery}
+                        onChange={(e) => setTagQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addDealTag(tagQuery);
+                          }
+                        }}
+                        placeholder="Ex: VIP, Urgente, Q4..."
+                        className="min-w-0 flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
+                        aria-label="Adicionar tag"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addDealTag(tagQuery)}
+                        disabled={!normalizeTag(tagQuery)}
+                        className="shrink-0 h-10 w-10 inline-flex items-center justify-center rounded-lg bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors"
+                        aria-label="Adicionar tag"
+                        title="Adicionar tag"
+                      >
+                        <Plus size={18} aria-hidden="true" />
+                      </button>
+                    </div>
+
+                    {(normalizeTag(tagQuery) && tagSuggestions.length > 0) && (
+                      <div className="mt-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden">
+                        {tagSuggestions.map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => addDealTag(t)}
+                            className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 

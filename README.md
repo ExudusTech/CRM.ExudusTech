@@ -1,93 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NossoCRM (Next.js + Supabase)
 
-## Getting Started
+CRM multi-tenant com foco em produtividade (pipeline/boards, contatos, atividades, inbox) e recursos de I.A. integrados. O frontend e o backend (Route Handlers) vivem no mesmo projeto Next.js.
 
-## Variáveis de ambiente
+## Stack
 
-Use o arquivo `.env.example` como base:
+- **Next.js (App Router)**: UI, páginas protegidas e APIs em `app/api/*`
+- **React 19** + **TypeScript**
+- **Supabase**: auth, Postgres e realtime
+- **TanStack Query**: cache e mutations
+- **Tailwind CSS** + Radix UI: UI e componentes base
 
-- copie para `.env.local`
-- preencha `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- para scripts/rotas internas server-side, configure também `SUPABASE_SERVICE_ROLE_KEY`
+## Estrutura do projeto (visão rápida)
+
+- `app/`: rotas (UI) e `app/api/*` (Route Handlers)
+  - `app/(protected)/`: páginas que exigem sessão
+  - `app/install/*`: fluxo de instalação/provisionamento
+- `features/`: páginas e componentes por domínio (boards, contatos, inbox, settings, etc.)
+- `components/`: componentes compartilhados (UI, modais, charts, etc.)
+- `lib/`: infra e integrações (Supabase, AI, segurança, query, realtime, utils)
+- `context/`: contexts globais do app (CRM, AI, settings, etc.)
+- `hooks/`: hooks reutilizáveis (fora de `features/`)
+- `services/`: camada de serviços (quando aplicável)
+- `supabase/`: migrações e scripts SQL
+- `docs/`: documentação do projeto
+
+## Pré-requisitos
+
+- **Node.js** (recomendado: versão LTS recente)
+- **npm** (ou outro gerenciador, mas este repo usa `package-lock.json`)
+
+## Setup local
+
+1) Instale dependências:
+
+```bash
+npm install
+```
+
+2) Configure variáveis de ambiente:
+
+- Use o arquivo `.env.example` como base
+- Copie para `.env.local`
+- Preencha:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY` (necessário para scripts/rotas server-side específicas)
 
 Por segurança, **não** comite `.env.local`.
 
+3) Rode o servidor:
+
+```bash
+npm run dev
+```
+
+Abra `http://localhost:3000`.
+
+## Scripts
+
+- `npm run dev`: roda o app em modo dev
+- `npm run build`: build de produção
+- `npm run start`: inicia o servidor após build
+- `npm run lint`: eslint (com `--max-warnings 0`)
+- `npm run typecheck`: TypeScript sem emitir arquivos
+- `npm run test` / `npm run test:run`: vitest
+
 ## Installer (ops)
 
-Para provisionar Vercel + Supabase via UI:
+Este repo possui um instalador para provisionar **Vercel + Supabase** via UI:
 
-- se `INSTALLER_ENABLED` nao existir, o instalador fica liberado ate a primeira instalacao
-- se quiser bloquear, defina `INSTALLER_ENABLED=false` (ou use `INSTALLER_TOKEN`)
-- acesse `/install` (ele redireciona para `/install/start`)
-- informe o Vercel PAT (o projeto e detectado automaticamente)
-- informe as credenciais do Supabase (incluindo DB URL)
+- Se `INSTALLER_ENABLED` não existir, o instalador fica liberado até a primeira instalação
+- Para bloquear manualmente, defina `INSTALLER_ENABLED=false` (ou use `INSTALLER_TOKEN`)
+- Acesse `/install` (redireciona para `/install/start`)
+- Informe:
+  - Vercel PAT (o projeto é detectado automaticamente)
+  - credenciais do Supabase (incluindo DB URL)
 
 Ao finalizar, o instalador grava `INSTALLER_ENABLED=false` nas envs do projeto.
 
-## AI test routes (dev-only)
+## Rotas de teste de I.A (apenas dev)
 
-This project contains an internal route and page used for AI integration testing:
+Este projeto contém rotas internas para testar a integração de I.A:
 
-- POST /api/ai/test
-- GET /ai-test
+- `POST /api/ai/test`
+- `GET /ai-test`
 
-For safety, both are disabled by default and only work in development when this env var is explicitly enabled:
+Por segurança, ambas ficam desativadas por padrão e só funcionam em desenvolvimento quando:
 
-- ALLOW_AI_TEST_ROUTE=true
+- `ALLOW_AI_TEST_ROUTE=true`
 
-Recommendation: enable only locally via .env.local and never in production.
+Recomendação: habilitar **apenas localmente** via `.env.local` e nunca em produção.
 
 ## Proxy (Next 16+) — padrão do projeto
 
 Este projeto usa **Next.js Proxy** via o arquivo `proxy.ts` na raiz.
 
-> No Next.js 16+, a convenção de arquivo `middleware.ts` foi **renomeada/deprecada** em favor de `proxy.ts`.
+> No Next.js 16+, a convenção `middleware.ts` foi renomeada/deprecada em favor de `proxy.ts`.
 
-Links oficiais (pra não ter dúvida):
-
-- https://nextjs.org/docs/app/api-reference/file-conventions/proxy
-- https://nextjs.org/docs/app/api-reference/file-conventions/proxy#migration-to-proxy
+Referência: `https://nextjs.org/docs/app/api-reference/file-conventions/proxy`
 
 Notas rápidas:
 
 - Só existe **um** `proxy.ts` por projeto; use `config.matcher` para limitar onde roda.
 - Neste repo, o `proxy.ts` **não intercepta** `/api/*` (Route Handlers devem responder com 401/403). Isso evita redirects 307 para `/login` quebrando `fetch`/SDKs.
 
-Importante: aqui “Proxy” é uma feature do Next. Não confundir com as rotas internas de IA (ex.: **`/api/ai/chat`** e **`/api/ai/tasks/*`**) usadas pela camada de IA.
+Importante: aqui “Proxy” é uma feature do Next. Não confundir com as rotas internas de IA (ex.: `/api/ai/chat` e `/api/ai/tasks/*`).
 
 ## Permissões (RBAC)
 
-- Ver `docs/security/RBAC.md` (papéis: **admin** e **vendedor**, e o que cada um pode/não pode fazer).
+- Consulte `docs/security/RBAC.md` (papéis **admin** e **vendedor** e o que cada um pode/não pode fazer).
 
-First, run the development server:
+## Documentação de código (JSDoc)
+
+Este repo mantém docstrings em **pt-BR** no padrão **JSDoc** para itens públicos/exportados.
+
+- Para (re)gerar JSDoc automaticamente:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+node scripts/add-jsdoc.mjs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O script evita sobrescrever docstrings existentes e tenta descrever `@param`/`@returns` com base em tipos e heurísticas comuns.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O caminho natural é **Vercel** (Next.js) + **Supabase** (DB/Auth/Realtime). O instalador (`/install`) também automatiza parte desse provisionamento quando habilitado.

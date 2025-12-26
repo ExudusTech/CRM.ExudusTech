@@ -13,6 +13,12 @@ interface RevenueTrendChartProps {
   data: Array<{ month: string; revenue: number }>;
 }
 
+/**
+ * Componente React `RevenueTrendChart`.
+ *
+ * @param {RevenueTrendChartProps} { data } - Parâmetro `{ data }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const RevenueTrendChart: React.FC<RevenueTrendChartProps> = ({ data }) => (
   <ResponsiveContainer width="100%" height="100%">
     <AreaChart data={data}>

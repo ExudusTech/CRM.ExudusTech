@@ -20,6 +20,12 @@ interface UseCRMAgentOptions {
   onToolCall?: (toolName: string, args: Record<string, unknown>) => void;
 }
 
+/**
+ * Hook React `useCRMAgent` que encapsula uma lógica reutilizável.
+ *
+ * @param {UseCRMAgentOptions} options - Opções de configuração.
+ * @returns {{ messages: AgentMessage[]; isLoading: boolean; error: Error | null; sendMessage: (content: string) => Promise<void>; clearMessages: () => void; stopGeneration: () => void; }} Retorna um valor do tipo `{ messages: AgentMessage[]; isLoading: boolean; error: Error | null; sendMessage: (content: string) => Promise<void>; clearMessages: () => void; stopGeneration: () => void; }`.
+ */
 export function useCRMAgent(options: UseCRMAgentOptions = {}) {
   const {
     deals,

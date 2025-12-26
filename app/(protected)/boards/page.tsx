@@ -8,6 +8,10 @@ const BoardsPage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Boards`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Boards() {
     return <BoardsPage />
 }

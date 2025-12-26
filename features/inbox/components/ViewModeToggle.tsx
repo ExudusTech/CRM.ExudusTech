@@ -7,6 +7,12 @@ interface ViewModeToggleProps {
   onChange: (mode: ViewMode) => void;
 }
 
+/**
+ * Componente React `ViewModeToggle`.
+ *
+ * @param {ViewModeToggleProps} { mode, onChange } - Parâmetro `{ mode, onChange }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ViewModeToggle: React.FC<ViewModeToggleProps> = ({ mode, onChange }) => {
   return (
     <div className="inline-flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-1 border border-slate-200 dark:border-white/10" role="group" aria-label="Modo de visualização">

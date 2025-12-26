@@ -92,6 +92,10 @@ function TimelineRow({ item }: { item: TimelineItem }) {
   );
 }
 
+/**
+ * Componente React `DealJobsMockClient`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function DealJobsMockClient() {
   const [showSystemEvents, setShowSystemEvents] = React.useState(false);
 

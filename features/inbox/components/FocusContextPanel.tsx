@@ -63,6 +63,32 @@ interface FocusContextPanelProps {
     isExpanded?: boolean;
 }
 
+/**
+ * Componente React `FocusContextPanel`.
+ *
+ * @param {FocusContextPanelProps} {
+    deal,
+    contact,
+    board,
+    activities,
+    onMoveStage,
+    onAddActivity,
+    onClose,
+    className,
+    isExpanded
+} - Parâmetro `{
+    deal,
+    contact,
+    board,
+    activities,
+    onMoveStage,
+    onAddActivity,
+    onClose,
+    className,
+    isExpanded
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const FocusContextPanel: React.FC<FocusContextPanelProps> = ({
     deal,
     contact,

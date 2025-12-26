@@ -15,6 +15,12 @@ interface FunnelChartProps {
   data: Array<{ name: string; count: number; fill?: string }>;
 }
 
+/**
+ * Componente React `FunnelChart`.
+ *
+ * @param {FunnelChartProps} { data } - Parâmetro `{ data }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const FunnelChart: React.FC<FunnelChartProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (

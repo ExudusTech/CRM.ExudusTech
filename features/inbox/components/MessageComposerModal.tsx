@@ -144,6 +144,34 @@ function formatForEmail(input: string) {
     return text;
 }
 
+/**
+ * Componente React `MessageComposerModal`.
+ *
+ * @param {MessageComposerModalProps} {
+    isOpen,
+    onClose,
+    channel,
+    contactName,
+    contactEmail,
+    contactPhone,
+    initialSubject,
+    initialMessage,
+    onExecuted,
+    aiContext,
+} - Parâmetro `{
+    isOpen,
+    onClose,
+    channel,
+    contactName,
+    contactEmail,
+    contactPhone,
+    initialSubject,
+    initialMessage,
+    onExecuted,
+    aiContext,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export function MessageComposerModal({
     isOpen,
     onClose,

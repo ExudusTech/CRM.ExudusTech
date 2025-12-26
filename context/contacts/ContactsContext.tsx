@@ -46,6 +46,12 @@ interface ContactsContextType {
 
 const ContactsContext = createContext<ContactsContextType | undefined>(undefined);
 
+/**
+ * Componente React `ContactsProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -244,6 +250,10 @@ export const ContactsProvider: React.FC<{ children: ReactNode }> = ({ children }
   return <ContactsContext.Provider value={value}>{children}</ContactsContext.Provider>;
 };
 
+/**
+ * Hook React `useContacts` que encapsula uma lógica reutilizável.
+ * @returns {ContactsContextType} Retorna um valor do tipo `ContactsContextType`.
+ */
 export const useContacts = () => {
   const context = useContext(ContactsContext);
   if (context === undefined) {

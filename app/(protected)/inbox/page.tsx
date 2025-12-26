@@ -8,6 +8,10 @@ const InboxPage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Inbox`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Inbox() {
     return <InboxPage />
 }

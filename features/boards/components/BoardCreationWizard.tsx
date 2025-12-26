@@ -92,6 +92,26 @@ function guessWonLostStageIds(stages: BoardStage[], opts?: { wonLabel?: string; 
   return { wonStageId: heuristicWon ?? '', lostStageId: heuristicLost ?? '' };
 }
 
+/**
+ * Componente React `BoardCreationWizard`.
+ *
+ * @param {BoardCreationWizardProps} {
+  isOpen,
+  onClose,
+  onCreate,
+  onCreateBoardAsync,
+  onUpdateBoardAsync,
+  onOpenCustomModal,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onCreate,
+  onCreateBoardAsync,
+  onUpdateBoardAsync,
+  onOpenCustomModal,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const BoardCreationWizard: React.FC<BoardCreationWizardProps> = ({
   isOpen,
   onClose,

@@ -12,6 +12,20 @@ interface InboxBriefingProps {
   };
 }
 
+/**
+ * Componente React `InboxBriefing`.
+ *
+ * @param {InboxBriefingProps} { 
+  briefing, 
+  isLoading,
+  stats 
+} - Parâmetro `{ 
+  briefing, 
+  isLoading,
+  stats 
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InboxBriefing: React.FC<InboxBriefingProps> = ({ 
   briefing, 
   isLoading,

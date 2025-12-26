@@ -8,6 +8,22 @@ interface ActivitiesHeaderProps {
   dateFilter?: 'ALL' | 'overdue' | 'today' | 'upcoming';
 }
 
+/**
+ * Componente React `ActivitiesHeader`.
+ *
+ * @param {ActivitiesHeaderProps} {
+  viewMode,
+  setViewMode,
+  onNewActivity,
+  dateFilter = 'ALL',
+} - Parâmetro `{
+  viewMode,
+  setViewMode,
+  onNewActivity,
+  dateFilter = 'ALL',
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesHeader: React.FC<ActivitiesHeaderProps> = ({
   viewMode,
   setViewMode,

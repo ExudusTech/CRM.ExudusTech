@@ -30,6 +30,10 @@ function looksLikeTransientNetworkError(err: unknown): boolean {
   );
 }
 
+/**
+ * Função pública `getSupabaseAdminClient` do projeto.
+ * @returns {SupabaseClient<any, "public", "public", any, any>} Retorna um valor do tipo `SupabaseClient<any, "public", "public", any, any>`.
+ */
 export function getSupabaseAdminClient(): SupabaseClient {
   if (adminClient) return adminClient;
 
@@ -47,6 +51,13 @@ export function getSupabaseAdminClient(): SupabaseClient {
   return adminClient;
 }
 
+/**
+ * Função pública `assertNoSupabaseError` do projeto.
+ *
+ * @param {{ error: unknown; }} res - Objeto da resposta.
+ * @param {string} context - Contexto de execução.
+ * @returns {void} Não retorna valor.
+ */
 export function assertNoSupabaseError(
   res: { error: unknown | null },
   context: string,
@@ -60,6 +71,13 @@ export function assertNoSupabaseError(
   throw new Error(`Supabase error (${context}): ${details}`);
 }
 
+/**
+ * Função pública `requireSupabaseData` do projeto.
+ *
+ * @param {SupabaseResult<T>} res - Objeto da resposta.
+ * @param {string} context - Contexto de execução.
+ * @returns {T} Retorna um valor do tipo `T`.
+ */
 export function requireSupabaseData<T>(res: SupabaseResult<T>, context: string): T {
   assertNoSupabaseError(res, context);
   if (res.data == null) {

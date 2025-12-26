@@ -41,6 +41,22 @@ const CONSENT_LABELS: Record<ConsentType, { title: string; description: string }
   },
 };
 
+/**
+ * Componente React `ConsentModal`.
+ *
+ * @param {ConsentModalProps} {
+  isOpen,
+  missingConsents,
+  onAccept,
+  onClose,
+} - Parâmetro `{
+  isOpen,
+  missingConsents,
+  onAccept,
+  onClose,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const ConsentModal: React.FC<ConsentModalProps> = ({
   isOpen,
   missingConsents,
@@ -90,7 +106,13 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({
   const canSubmit = REQUIRED_CONSENTS.every(c => selectedConsents.has(c));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={(e) => {
+        // Close only when clicking the backdrop (outside the panel).
+        if (e.target === e.currentTarget) onClose?.();
+      }}
+    >
       <div className="bg-white dark:bg-dark-card rounded-xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 dark:border-dark-border">

@@ -138,6 +138,10 @@ const APINotConfigured: React.FC = () => {
   );
 };
 
+/**
+ * Componente React `AIHubPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AIHubPage: React.FC = () => {
   const router = useRouter();
   const { aiApiKey } = useCRM();

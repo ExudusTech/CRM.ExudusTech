@@ -61,6 +61,30 @@ interface InboxFocusViewProps {
   onNext: () => void;
 }
 
+/**
+ * Componente React `InboxFocusView`.
+ *
+ * @param {InboxFocusViewProps} {
+  currentItem,
+  currentIndex,
+  totalItems,
+  onDone,
+  onSnooze,
+  onSkip,
+  onPrev,
+  onNext,
+} - Parâmetro `{
+  currentItem,
+  currentIndex,
+  totalItems,
+  onDone,
+  onSnooze,
+  onSkip,
+  onPrev,
+  onNext,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InboxFocusView: React.FC<InboxFocusViewProps> = ({
   currentItem,
   currentIndex,

@@ -41,22 +41,55 @@ export function expectAriaLabel(element: HTMLElement, label: string): void {
   expect(element).toHaveAttribute('aria-label', label);
 }
 
+/**
+ * Função pública `expectAriaLabelledBy` do projeto.
+ *
+ * @param {HTMLElement} element - Parâmetro `element`.
+ * @param {string} id - Identificador do recurso.
+ * @returns {void} Não retorna valor.
+ */
 export function expectAriaLabelledBy(element: HTMLElement, id: string): void {
   expect(element).toHaveAttribute('aria-labelledby', id);
 }
 
+/**
+ * Função pública `expectAriaDescribedBy` do projeto.
+ *
+ * @param {HTMLElement} element - Parâmetro `element`.
+ * @param {string} id - Identificador do recurso.
+ * @returns {void} Não retorna valor.
+ */
 export function expectAriaDescribedBy(element: HTMLElement, id: string): void {
   expect(element).toHaveAttribute('aria-describedby', id);
 }
 
+/**
+ * Função pública `expectRole` do projeto.
+ *
+ * @param {HTMLElement} element - Parâmetro `element`.
+ * @param {string} role - Parâmetro `role`.
+ * @returns {void} Não retorna valor.
+ */
 export function expectRole(element: HTMLElement, role: string): void {
   expect(element).toHaveAttribute('role', role);
 }
 
+/**
+ * Função pública `expectFocusable` do projeto.
+ *
+ * @param {HTMLElement} element - Parâmetro `element`.
+ * @returns {void} Não retorna valor.
+ */
 export function expectFocusable(element: HTMLElement): void {
   expect(element.tabIndex).toBeGreaterThanOrEqual(0);
 }
 
+/**
+ * Função pública `expectNotFocusable` do projeto.
+ *
+ * @param {HTMLElement} element - Parâmetro `element`.
+ * @returns {void} Não retorna valor.
+ */
 export function expectNotFocusable(element: HTMLElement): void {
   expect(element.tabIndex).toBe(-1);
 }
@@ -85,6 +118,10 @@ export function simulateTab(shift = false): void {
   );
 }
 
+/**
+ * Função pública `simulateEscape` do projeto.
+ * @returns {void} Não retorna valor.
+ */
 export function simulateEscape(): void {
   document.activeElement?.dispatchEvent(
     new KeyboardEvent('keydown', {
@@ -94,6 +131,10 @@ export function simulateEscape(): void {
   );
 }
 
+/**
+ * Função pública `simulateEnter` do projeto.
+ * @returns {void} Não retorna valor.
+ */
 export function simulateEnter(): void {
   document.activeElement?.dispatchEvent(
     new KeyboardEvent('keydown', {
@@ -103,6 +144,10 @@ export function simulateEnter(): void {
   );
 }
 
+/**
+ * Função pública `simulateSpace` do projeto.
+ * @returns {void} Não retorna valor.
+ */
 export function simulateSpace(): void {
   document.activeElement?.dispatchEvent(
     new KeyboardEvent('keydown', {

@@ -25,6 +25,38 @@ interface KanbanHeaderProps {
     onNewDeal: () => void;
 }
 
+/**
+ * Componente React `KanbanHeader`.
+ *
+ * @param {KanbanHeaderProps} {
+    boards,
+    activeBoard,
+    onSelectBoard,
+    onCreateBoard,
+    onEditBoard,
+    onDeleteBoard,
+    onExportTemplates,
+    viewMode, setViewMode,
+    searchTerm, setSearchTerm,
+    ownerFilter, setOwnerFilter,
+    statusFilter, setStatusFilter,
+    onNewDeal
+} - Parâmetro `{
+    boards,
+    activeBoard,
+    onSelectBoard,
+    onCreateBoard,
+    onEditBoard,
+    onDeleteBoard,
+    onExportTemplates,
+    viewMode, setViewMode,
+    searchTerm, setSearchTerm,
+    ownerFilter, setOwnerFilter,
+    statusFilter, setStatusFilter,
+    onNewDeal
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const KanbanHeader: React.FC<KanbanHeaderProps> = ({
     boards,
     activeBoard,

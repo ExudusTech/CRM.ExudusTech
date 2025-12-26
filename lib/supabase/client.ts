@@ -14,6 +14,10 @@ const isConfigured = supabaseUrl &&
 
 let _supabase: SupabaseClient | null = null
 
+/**
+ * Função pública `createClient` do projeto.
+ * @returns {SupabaseClient<any, "public", "public", any, any> | null} Retorna um valor do tipo `SupabaseClient<any, "public", "public", any, any> | null`.
+ */
 export function createClient(): SupabaseClient | null {
     if (!isConfigured) {
         console.warn('[supabase] Not configured - auth will not work')

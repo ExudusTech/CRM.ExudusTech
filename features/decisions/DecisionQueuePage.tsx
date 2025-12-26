@@ -28,6 +28,10 @@ const PT_BR_DATE_TIME_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
   minute: '2-digit',
 });
 
+/**
+ * Componente React `DecisionQueuePage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const DecisionQueuePage: React.FC = () => {
   const {
     decisions,

@@ -2,6 +2,10 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 
+/**
+ * Componente React `Home`.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export default async function Home() {
     // Após um reset do banco, a instância ainda não está inicializada.
     // Nessa fase, a página inicial deve levar o usuário para o setup.

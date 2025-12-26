@@ -10,8 +10,33 @@ interface ContactsHeaderProps {
   isFilterOpen: boolean;
   setIsFilterOpen: (value: boolean) => void;
   openCreateModal: () => void;
+  openImportExportModal?: () => void;
 }
 
+/**
+ * Componente React `ContactsHeader`.
+ *
+ * @param {ContactsHeaderProps} {
+  viewMode,
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
+  isFilterOpen,
+  setIsFilterOpen,
+  openCreateModal,
+} - Parâmetro `{
+  viewMode,
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
+  isFilterOpen,
+  setIsFilterOpen,
+  openCreateModal,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsHeader: React.FC<ContactsHeaderProps> = ({
   viewMode,
   search,
@@ -21,6 +46,7 @@ export const ContactsHeader: React.FC<ContactsHeaderProps> = ({
   isFilterOpen,
   setIsFilterOpen,
   openCreateModal,
+  openImportExportModal,
 }) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -71,17 +97,21 @@ export const ContactsHeader: React.FC<ContactsHeaderProps> = ({
         >
           <Filter size={20} aria-hidden="true" />
         </button>
-        <button
-          aria-label="Exportar contatos"
-          className="p-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"
-        >
-          <Download size={20} aria-hidden="true" />
-        </button>
+        {viewMode === 'people' && (
+          <button
+            type="button"
+            onClick={openImportExportModal}
+            aria-label="Importar/Exportar contatos"
+            className="p-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-white/10 text-slate-600 dark:text-slate-400 transition-colors"
+          >
+            <Download size={20} aria-hidden="true" />
+          </button>
+        )}
         <button
           onClick={openCreateModal}
           className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-primary-600/20"
         >
-          <Plus size={18} /> Novo Contato
+          <Plus size={18} /> {viewMode === 'people' ? 'Novo Contato' : 'Nova Empresa'}
         </button>
       </div>
     </div>

@@ -34,6 +34,12 @@ interface DealsContextType {
 
 const DealsContext = createContext<DealsContextType | undefined>(undefined);
 
+/**
+ * Componente React `DealsProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -186,6 +192,10 @@ export const DealsProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return <DealsContext.Provider value={value}>{children}</DealsContext.Provider>;
 };
 
+/**
+ * Hook React `useDeals` que encapsula uma lógica reutilizável.
+ * @returns {DealsContextType} Retorna um valor do tipo `DealsContextType`.
+ */
 export const useDeals = () => {
   const context = useContext(DealsContext);
   if (context === undefined) {
@@ -195,6 +205,14 @@ export const useDeals = () => {
 };
 
 // Hook para deals com view projection (desnormalizado)
+/**
+ * Hook React `useDealsView` que encapsula uma lógica reutilizável.
+ *
+ * @param {Record<string, Organization>} companyMap - Parâmetro `companyMap`.
+ * @param {Record<string, Contact>} contactMap - Parâmetro `contactMap`.
+ * @param {Board[]} boards - Parâmetro `boards`.
+ * @returns {DealView[]} Retorna um valor do tipo `DealView[]`.
+ */
 export const useDealsView = (
   companyMap: Record<string, Company>,
   contactMap: Record<string, Contact>,

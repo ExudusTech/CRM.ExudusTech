@@ -38,6 +38,24 @@ const getSafeActivityType = (type?: Activity['type']): FormActivityType => {
   return 'CALL';
 };
 
+/**
+ * Componente React `ActivityFormModalV2`.
+ *
+ * @param {ActivityFormModalV2Props} {
+  isOpen,
+  onClose,
+  onSubmit,
+  editingActivity,
+  deals,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSubmit,
+  editingActivity,
+  deals,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivityFormModalV2: React.FC<ActivityFormModalV2Props> = ({
   isOpen,
   onClose,

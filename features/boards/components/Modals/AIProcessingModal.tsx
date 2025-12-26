@@ -10,6 +10,12 @@ interface AIProcessingModalProps {
     phase?: SimulatorPhase;
 }
 
+/**
+ * Componente React `AIProcessingModal`.
+ *
+ * @param {AIProcessingModalProps} { isOpen, currentStep, phase = 'structure' } - Parâmetro `{ isOpen, currentStep, phase = 'structure' }`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const AIProcessingModal: React.FC<AIProcessingModalProps> = ({ isOpen, currentStep, phase = 'structure' }) => {
     if (!isOpen) return null;
 

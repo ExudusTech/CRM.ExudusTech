@@ -15,6 +15,22 @@ interface DebugFillButtonProps {
   className?: string;
 }
 
+/**
+ * Componente React `DebugFillButton`.
+ *
+ * @param {DebugFillButtonProps} {
+  onClick,
+  label = 'Fake',
+  variant = 'primary',
+  className = '',
+} - Parâmetro `{
+  onClick,
+  label = 'Fake',
+  variant = 'primary',
+  className = '',
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const DebugFillButton: React.FC<DebugFillButtonProps> = ({
   onClick,
   label = 'Fake',

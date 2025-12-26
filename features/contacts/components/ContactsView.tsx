@@ -9,6 +9,22 @@ interface ContactsViewProps {
   onRefresh: () => void;
 }
 
+/**
+ * Componente React `ContactsView`.
+ *
+ * @param {ContactsViewProps} { 
+  contacts, 
+  isLoading, 
+  onSearch, 
+  onRefresh 
+} - Parâmetro `{ 
+  contacts, 
+  isLoading, 
+  onSearch, 
+  onRefresh 
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsView: React.FC<ContactsViewProps> = ({ 
   contacts, 
   isLoading, 

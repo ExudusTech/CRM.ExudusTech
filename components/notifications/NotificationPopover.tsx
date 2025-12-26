@@ -13,6 +13,10 @@ const getTimeAgo = (date: Date) => {
     return `há ${Math.floor(diffInSeconds / 86400)} dias`;
 };
 
+/**
+ * Componente React `NotificationPopover`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const NotificationPopover = () => {
     const { notifications, count, hasHighSeverity, markAsRead, markAllAsRead } = useSystemNotifications();
     const [isOpen, setIsOpen] = useState(false);

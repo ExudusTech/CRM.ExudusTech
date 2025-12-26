@@ -5,6 +5,12 @@ interface ContactsFiltersProps {
     setDateRange: (range: { start: string; end: string }) => void;
 }
 
+/**
+ * Componente React `ContactsFilters`.
+ *
+ * @param {ContactsFiltersProps} { dateRange, setDateRange } - Parâmetro `{ dateRange, setDateRange }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactsFilters: React.FC<ContactsFiltersProps> = ({ dateRange, setDateRange }) => {
     return (
         <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 animate-in slide-in-from-top-2">

@@ -157,6 +157,13 @@ function calculateChange(current: number, previous: number): number {
   return ((current - previous) / previous) * 100;
 }
 
+/**
+ * Hook React `useDashboardMetrics` que encapsula uma lógica reutilizável.
+ *
+ * @param {PeriodFilter} period - Parâmetro `period`.
+ * @param {string | undefined} boardId - Identificador do recurso.
+ * @returns {{ isLoading: boolean; deals: Deal[]; totalValue: number; wonDeals: Deal[]; wonRevenue: number; winRate: number; pipelineValue: number; topDeals: Deal[]; funnelData: { name: string; count: number; fill: string; }[]; ... 19 more ...; activeSnapshotDeals: Deal[]; }} Retorna um valor do tipo `{ isLoading: boolean; deals: Deal[]; totalValue: number; wonDeals: Deal[]; wonRevenue: number; winRate: number; pipelineValue: number; topDeals: Deal[]; funnelData: { name: string; count: number; fill: string; }[]; ... 19 more ...; activeSnapshotDeals: Deal[]; }`.
+ */
 export const useDashboardMetrics = (period: PeriodFilter = 'this_month', boardId?: string) => {
   const { data: allDeals = [], isLoading: dealsLoading } = useDeals();
   const { data: allContacts = [], isLoading: contactsLoading } = useContacts();

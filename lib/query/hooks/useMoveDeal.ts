@@ -43,6 +43,10 @@ interface MoveDealContext {
   previousState: [readonly unknown[], Deal[] | DealView[] | undefined][];
 }
 
+/**
+ * Hook React `useMoveDeal` que encapsula uma lógica reutilizável.
+ * @returns {UseMutationResult<MoveDealResult, Error, MoveDealParams, MoveDealContext>} Retorna um valor do tipo `UseMutationResult<MoveDealResult, Error, MoveDealParams, MoveDealContext>`.
+ */
 export const useMoveDeal = () => {
   const queryClient = useQueryClient();
 
@@ -265,6 +269,13 @@ export const useMoveDeal = () => {
   });
 };
 
+/**
+ * Hook React `useMoveDealSimple` que encapsula uma lógica reutilizável.
+ *
+ * @param {Board | null} board - Parâmetro `board`.
+ * @param {{ id: string; name: string; }[] | undefined} lifecycleStages - Parâmetro `lifecycleStages`.
+ * @returns {{ moveDeal: (deal: Deal | DealView, targetStageId: string, lossReason?: string | undefined, explicitWin?: boolean | undefined, explicitLost?: boolean | undefined) => Promise<...>; isMoving: boolean; error: Error | null; }} Retorna um valor do tipo `{ moveDeal: (deal: Deal | DealView, targetStageId: string, lossReason?: string | undefined, explicitWin?: boolean | undefined, explicitLost?: boolean | undefined) => Promise<...>; isMoving: boolean; error: Error | null; }`.
+ */
 export const useMoveDealSimple = (
   board: Board | null,
   lifecycleStages?: { id: string; name: string }[]

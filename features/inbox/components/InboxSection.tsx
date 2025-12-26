@@ -18,6 +18,32 @@ interface InboxSectionProps {
   filterParam?: string; // e.g., 'overdue', 'today', 'upcoming'
 }
 
+/**
+ * Componente React `InboxSection`.
+ *
+ * @param {InboxSectionProps} {
+  title,
+  activities,
+  color,
+  defaultOpen = true,
+  onToggleComplete,
+  onSnooze,
+  onDiscard,
+  onSelect,
+  filterParam
+} - Parâmetro `{
+  title,
+  activities,
+  color,
+  defaultOpen = true,
+  onToggleComplete,
+  onSnooze,
+  onDiscard,
+  onSelect,
+  filterParam
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const InboxSection: React.FC<InboxSectionProps> = ({
   title,
   activities,

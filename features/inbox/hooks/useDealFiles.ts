@@ -5,6 +5,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dealFilesService, DealFile } from '@/lib/supabase/dealFiles';
 
+/**
+ * Hook React `useDealFiles` que encapsula uma lógica reutilizável.
+ *
+ * @param {string | undefined} dealId - Identificador do recurso.
+ * @returns {{ files: DealFile[]; isLoading: boolean; error: Error | null; uploadFile: UseMutationResult<DealFile | null, Error, File, unknown>; deleteFile: UseMutationResult<...>; downloadFile: (file: DealFile) => Promise<...>; formatFileSize: (bytes: number | null) => string; }} Retorna um valor do tipo `{ files: DealFile[]; isLoading: boolean; error: Error | null; uploadFile: UseMutationResult<DealFile | null, Error, File, unknown>; deleteFile: UseMutationResult<...>; downloadFile: (file: DealFile) => Promise<...>; formatFileSize: (bytes: number | null) => string; }`.
+ */
 export function useDealFiles(dealId: string | undefined) {
     const queryClient = useQueryClient();
     const queryKey = ['deal-files', dealId];

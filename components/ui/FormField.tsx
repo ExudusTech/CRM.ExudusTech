@@ -61,6 +61,34 @@ interface FormFieldProps {
   isTouched?: boolean;
 }
 
+/**
+ * Componente React `FormField`.
+ *
+ * @param {FormFieldProps} {
+  label,
+  error,
+  hint,
+  children,
+  className,
+  required,
+  id,
+  showSuccessState = false,
+  isDirty,
+  isTouched,
+} - Parâmetro `{
+  label,
+  error,
+  hint,
+  children,
+  className,
+  required,
+  id,
+  showSuccessState = false,
+  isDirty,
+  isTouched,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const FormField: React.FC<FormFieldProps> = ({
   label,
   error,
@@ -141,6 +169,36 @@ interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
   isTouched?: boolean;
 }
 
+/**
+ * Componente React `InputField`.
+ *
+ * @param {InputFieldProps} {
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  inputClassName,
+  showSuccessState,
+  isDirty,
+  isTouched,
+  required,
+  ...props
+} - Parâmetro `{
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  inputClassName,
+  showSuccessState,
+  isDirty,
+  isTouched,
+  required,
+  ...props
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   error,
@@ -195,6 +253,30 @@ interface TextareaFieldProps extends Omit<
   textareaClassName?: string;
 }
 
+/**
+ * Componente React `TextareaField`.
+ *
+ * @param {TextareaFieldProps} {
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  textareaClassName,
+  required,
+  ...props
+} - Parâmetro `{
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  textareaClassName,
+  required,
+  ...props
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const TextareaField: React.FC<TextareaFieldProps> = ({
   label,
   error,
@@ -247,6 +329,34 @@ interface SelectFieldProps extends Omit<
   selectClassName?: string;
 }
 
+/**
+ * Componente React `SelectField`.
+ *
+ * @param {SelectFieldProps} {
+  label,
+  options,
+  error,
+  hint,
+  registration,
+  placeholder,
+  containerClassName,
+  selectClassName,
+  required,
+  ...props
+} - Parâmetro `{
+  label,
+  options,
+  error,
+  hint,
+  registration,
+  placeholder,
+  containerClassName,
+  selectClassName,
+  required,
+  ...props
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const SelectField: React.FC<SelectFieldProps> = ({
   label,
   options,
@@ -298,6 +408,26 @@ interface CheckboxFieldProps extends Omit<
   containerClassName?: string;
 }
 
+/**
+ * Componente React `CheckboxField`.
+ *
+ * @param {CheckboxFieldProps} {
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  ...props
+} - Parâmetro `{
+  label,
+  error,
+  hint,
+  registration,
+  containerClassName,
+  ...props
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const CheckboxField: React.FC<CheckboxFieldProps> = ({
   label,
   error,
@@ -353,6 +483,28 @@ const buttonVariants = {
   danger: 'bg-red-600 hover:bg-red-500 shadow-red-600/20',
 };
 
+/**
+ * Componente React `SubmitButton`.
+ *
+ * @param {SubmitButtonProps} {
+  children,
+  isLoading,
+  loadingText = 'Salvando...',
+  disabled,
+  className,
+  variant = 'primary',
+  ...props
+} - Parâmetro `{
+  children,
+  isLoading,
+  loadingText = 'Salvando...',
+  disabled,
+  className,
+  variant = 'primary',
+  ...props
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const SubmitButton: React.FC<SubmitButtonProps> = ({
   children,
   isLoading,
@@ -409,6 +561,12 @@ interface FormErrorSummaryProps {
   className?: string;
 }
 
+/**
+ * Componente React `FormErrorSummary`.
+ *
+ * @param {FormErrorSummaryProps} { errors, className } - Parâmetro `{ errors, className }`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const FormErrorSummary: React.FC<FormErrorSummaryProps> = ({ errors, className }) => {
   const errorList = Object.entries(errors).filter(
     (entry): entry is [string, FieldError] => entry[1] !== undefined

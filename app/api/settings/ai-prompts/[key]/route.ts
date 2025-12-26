@@ -8,6 +8,13 @@ function json<T>(body: T, status = 200): Response {
   });
 }
 
+/**
+ * Handler HTTP `GET` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} _req - Parâmetro `_req`.
+ * @param {{ params: Promise<{ key: string; }>; }} ctx - Contexto de execução.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function GET(_req: Request, ctx: { params: Promise<{ key: string }> }) {
   const { key } = await ctx.params;
 
@@ -40,6 +47,13 @@ export async function GET(_req: Request, ctx: { params: Promise<{ key: string }>
   return json({ key, active, versions: data || [] });
 }
 
+/**
+ * Handler HTTP `DELETE` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @param {{ params: Promise<{ key: string; }>; }} ctx - Contexto de execução.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function DELETE(req: Request, ctx: { params: Promise<{ key: string }> }) {
   if (!isAllowedOrigin(req)) return json({ error: 'Forbidden' }, 403);
 

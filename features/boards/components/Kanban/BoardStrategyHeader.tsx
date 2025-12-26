@@ -20,6 +20,12 @@ interface BoardStrategyHeaderProps {
   board: Board;
 }
 
+/**
+ * Componente React `BoardStrategyHeader`.
+ *
+ * @param {BoardStrategyHeaderProps} { board } - Parâmetro `{ board }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const BoardStrategyHeader: React.FC<BoardStrategyHeaderProps> = ({ board }) => {
   const { updateBoard, setIsGlobalAIOpen, boards, deals } = useCRM();
   const [isEditing, setIsEditing] = useState(false);

@@ -67,6 +67,38 @@ interface KanbanBoardProps {
   /** Callback to move a deal to a new stage (for keyboard accessibility) */
   onMoveDealToStage?: (dealId: string, newStageId: string) => void;
 }
+/**
+ * Componente React `KanbanBoard`.
+ *
+ * @param {KanbanBoardProps} {
+  stages,
+  filteredDeals,
+  draggingId,
+  handleDragStart,
+  handleDragOver,
+  handleDrop,
+  setSelectedDealId,
+  openActivityMenuId,
+  setOpenActivityMenuId,
+  handleQuickAddActivity,
+  setLastMouseDownDealId,
+  onMoveDealToStage,
+} - Parâmetro `{
+  stages,
+  filteredDeals,
+  draggingId,
+  handleDragStart,
+  handleDragOver,
+  handleDrop,
+  setSelectedDealId,
+  openActivityMenuId,
+  setOpenActivityMenuId,
+  handleQuickAddActivity,
+  setLastMouseDownDealId,
+  onMoveDealToStage,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   stages,
   filteredDeals,

@@ -13,6 +13,30 @@ interface DeleteBoardModalProps {
   onSelectTargetBoard: (boardId: string) => void;
 }
 
+/**
+ * Componente React `DeleteBoardModal`.
+ *
+ * @param {DeleteBoardModalProps} {
+  isOpen,
+  onClose,
+  onConfirm,
+  boardName,
+  dealCount,
+  availableBoards,
+  selectedTargetBoardId,
+  onSelectTargetBoard,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onConfirm,
+  boardName,
+  dealCount,
+  availableBoards,
+  selectedTargetBoardId,
+  onSelectTargetBoard,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
   isOpen,
   onClose,
@@ -30,8 +54,17 @@ export const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
   const canDelete = !hasDeals || selectedTargetBoardId;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-dark-card rounded-2xl max-w-md w-full shadow-2xl">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={(e) => {
+        // Close only when clicking the backdrop (outside the panel).
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="bg-white dark:bg-dark-card rounded-2xl max-w-md w-full shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-dark-border">
           <div className="flex items-center gap-3">

@@ -144,12 +144,22 @@ const translations: Record<string, Translations> = {
 // Current locale (can be changed dynamically)
 let currentLocale = 'pt-BR';
 
+/**
+ * Função pública `setLocale` do projeto.
+ *
+ * @param {string} locale - Parâmetro `locale`.
+ * @returns {void} Não retorna valor.
+ */
 export const setLocale = (locale: string) => {
   if (translations[locale]) {
     currentLocale = locale;
   }
 };
 
+/**
+ * Função pública `getLocale` do projeto.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export const getLocale = () => currentLocale;
 
 interface ErrorParams {

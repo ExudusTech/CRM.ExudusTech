@@ -27,6 +27,13 @@ function parseDotEnv(contents: string): Record<string, string> {
   return out;
 }
 
+/**
+ * Função pública `loadEnvFile` do projeto.
+ *
+ * @param {string} filePath - Parâmetro `filePath`.
+ * @param {{ override?: boolean | undefined; } | undefined} opts - Parâmetro `opts`.
+ * @returns {void} Não retorna valor.
+ */
 export function loadEnvFile(filePath: string, opts?: { override?: boolean }) {
   if (!existsSync(filePath)) return;
   const parsed = parseDotEnv(readFileSync(filePath, 'utf8'));
@@ -36,12 +43,22 @@ export function loadEnvFile(filePath: string, opts?: { override?: boolean }) {
   }
 }
 
+/**
+ * Função pública `requireEnv` do projeto.
+ *
+ * @param {string} name - Parâmetro `name`.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`Missing required env var: ${name}`);
   return value;
 }
 
+/**
+ * Função pública `getSupabaseUrl` do projeto.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export function getSupabaseUrl(): string {
   return (
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -50,10 +67,20 @@ export function getSupabaseUrl(): string {
   );
 }
 
+/**
+ * Função pública `getServiceRoleKey` do projeto.
+ * @returns {string} Retorna um valor do tipo `string`.
+ */
 export function getServiceRoleKey(): string {
   return process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 }
 
+/**
+ * Função pública `isPlaceholderApiKey` do projeto.
+ *
+ * @param {string | null | undefined} value - Parâmetro `value`.
+ * @returns {boolean} Retorna um valor do tipo `boolean`.
+ */
 export function isPlaceholderApiKey(value?: string | null): boolean {
   if (!value) return true;
   const v = value.trim();

@@ -9,6 +9,22 @@ interface ActivitiesFiltersProps {
   setFilterType: (type: Activity['type'] | 'ALL') => void;
 }
 
+/**
+ * Componente React `ActivitiesFilters`.
+ *
+ * @param {ActivitiesFiltersProps} {
+  searchTerm,
+  setSearchTerm,
+  filterType,
+  setFilterType,
+} - Parâmetro `{
+  searchTerm,
+  setSearchTerm,
+  filterType,
+  setFilterType,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesFilters: React.FC<ActivitiesFiltersProps> = ({
   searchTerm,
   setSearchTerm,

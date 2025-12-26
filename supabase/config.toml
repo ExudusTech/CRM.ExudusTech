@@ -87,3 +87,11 @@ enabled = false
 
 [auth.external.github]
 enabled = false
+
+# -----------------------------------------------------------------------------
+# Edge Functions (webhooks)
+# -----------------------------------------------------------------------------
+# Estes endpoints precisam ser públicos para que Hotmart/forms/n8n possam chamar,
+# portanto desabilitamos a verificação de JWT.
+[functions.webhook-in]
+verify_jwt = false

@@ -25,6 +25,30 @@ interface AIAssistantProps {
   contextMode?: 'auto' | 'props-only';
 }
 
+/**
+ * Componente React `AIAssistant`.
+ *
+ * @param {AIAssistantProps} {
+  isOpen,
+  onClose,
+  variant = 'overlay',
+  activeBoard,
+  dealId,
+  contactId,
+  cockpitSnapshot,
+  contextMode,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  variant = 'overlay',
+  activeBoard,
+  dealId,
+  contactId,
+  cockpitSnapshot,
+  contextMode,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 const AIAssistant: React.FC<AIAssistantProps> = ({
   isOpen,
   onClose,
@@ -75,8 +99,17 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 shadow-2xl shadow-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={(e) => {
+        // Close only when clicking the backdrop (outside the panel).
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-900 shadow-2xl shadow-black/50"
+        onClick={(e) => e.stopPropagation()}
+      >
         {content}
       </div>
     </div>

@@ -25,6 +25,12 @@ interface ActivitiesContextType {
 
 const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undefined);
 
+/**
+ * Componente React `ActivitiesProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ActivitiesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -136,6 +142,10 @@ export const ActivitiesProvider: React.FC<{ children: ReactNode }> = ({ children
   return <ActivitiesContext.Provider value={value}>{children}</ActivitiesContext.Provider>;
 };
 
+/**
+ * Hook React `useActivities` que encapsula uma lógica reutilizável.
+ * @returns {ActivitiesContextType} Retorna um valor do tipo `ActivitiesContextType`.
+ */
 export const useActivities = () => {
   const context = useContext(ActivitiesContext);
   if (context === undefined) {

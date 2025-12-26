@@ -58,6 +58,13 @@ async function postTask<T>(path: string, payload: unknown): Promise<T> {
   return data as T;
 }
 
+/**
+ * Função pública `analyzeLead` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {string | undefined} stageLabel - Parâmetro `stageLabel`.
+ * @returns {Promise<AnalyzeLeadResult>} Retorna um valor do tipo `Promise<AnalyzeLeadResult>`.
+ */
 export async function analyzeLead(
   deal: Deal | DealView,
   stageLabel?: string
@@ -79,6 +86,13 @@ export async function analyzeLead(
   };
 }
 
+/**
+ * Função pública `generateEmailDraft` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {string | undefined} stageLabel - Parâmetro `stageLabel`.
+ * @returns {Promise<string>} Retorna um valor do tipo `Promise<string>`.
+ */
 export async function generateEmailDraft(deal: Deal | DealView, stageLabel?: string): Promise<string> {
   const result = await postTask<{ text: string }>('/api/ai/tasks/deals/email-draft', {
     deal: {
@@ -94,6 +108,13 @@ export async function generateEmailDraft(deal: Deal | DealView, stageLabel?: str
   return result.text;
 }
 
+/**
+ * Função pública `generateObjectionResponse` do projeto.
+ *
+ * @param {Deal | DealView} deal - Parâmetro `deal`.
+ * @param {string} objection - Parâmetro `objection`.
+ * @returns {Promise<string[]>} Retorna um valor do tipo `Promise<string[]>`.
+ */
 export async function generateObjectionResponse(
   deal: Deal | DealView,
   objection: string
@@ -106,6 +127,13 @@ export async function generateObjectionResponse(
   return result.responses;
 }
 
+/**
+ * Função pública `generateBoardStructure` do projeto.
+ *
+ * @param {string} description - Parâmetro `description`.
+ * @param {LifecycleStage[]} lifecycleStages - Parâmetro `lifecycleStages`.
+ * @returns {Promise<{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }>} Retorna um valor do tipo `Promise<{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }>`.
+ */
 export async function generateBoardStructure(
   description: string,
   lifecycleStages: LifecycleStage[] = []
@@ -121,6 +149,12 @@ export async function generateBoardStructure(
   });
 }
 
+/**
+ * Função pública `generateBoardStrategy` do projeto.
+ *
+ * @param {{ boardName: string; description: string; stages: { name: string; description: string; color: string; linkedLifecycleStage: string; estimatedDuration?: string | undefined; }[]; automationSuggestions: string[]; }} boardData - Parâmetro `boardData`.
+ * @returns {Promise<Pick<GeneratedBoard, "goal" | "agentPersona" | "entryTrigger">>} Retorna um valor do tipo `Promise<Pick<GeneratedBoard, "goal" | "agentPersona" | "entryTrigger">>`.
+ */
 export async function generateBoardStrategy(boardData: {
   boardName: string;
   description: string;
@@ -130,6 +164,14 @@ export async function generateBoardStrategy(boardData: {
   return await postTask('/api/ai/tasks/boards/generate-strategy', { boardData });
 }
 
+/**
+ * Função pública `refineBoardWithAI` do projeto.
+ *
+ * @param {GeneratedBoard} currentBoard - Parâmetro `currentBoard`.
+ * @param {string} userInstruction - Parâmetro `userInstruction`.
+ * @param {{ role: "user" | "ai"; content: string; }[] | undefined} chatHistory - Parâmetro `chatHistory`.
+ * @returns {Promise<{ message: string; board: any; }>} Retorna um valor do tipo `Promise<{ message: string; board: any; }>`.
+ */
 export async function refineBoardWithAI(
   currentBoard: GeneratedBoard,
   userInstruction: string,
@@ -155,11 +197,23 @@ export async function refineBoardWithAI(
   return result;
 }
 
+/**
+ * Função pública `generateDailyBriefing` do projeto.
+ *
+ * @param {unknown} radarData - Parâmetro `radarData`.
+ * @returns {Promise<string>} Retorna um valor do tipo `Promise<string>`.
+ */
 export async function generateDailyBriefing(radarData: unknown): Promise<string> {
   const result = await postTask<{ text: string }>('/api/ai/tasks/inbox/daily-briefing', { radarData });
   return result.text;
 }
 
+/**
+ * Função pública `generateSalesScript` do projeto.
+ *
+ * @param {{ deal: { title?: string | undefined; }; scriptType?: string | undefined; context?: string | undefined; }} args - Parâmetro `args`.
+ * @returns {Promise<{ script: string; scriptType?: string | undefined; generatedFor?: string | undefined; }>} Retorna um valor do tipo `Promise<{ script: string; scriptType?: string | undefined; generatedFor?: string | undefined; }>`.
+ */
 export async function generateSalesScript(args: {
   deal: { title?: string };
   scriptType?: string;

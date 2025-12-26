@@ -129,6 +129,10 @@ export const PROMPT_CATALOG: PromptCatalogItem[] = [
   },
 ];
 
+/**
+ * Função pública `getPromptCatalogMap` do projeto.
+ * @returns {Record<string, PromptCatalogItem>} Retorna um valor do tipo `Record<string, PromptCatalogItem>`.
+ */
 export function getPromptCatalogMap(): Record<string, PromptCatalogItem> {
   return Object.fromEntries(PROMPT_CATALOG.map((p) => [p.key, p]));
 }

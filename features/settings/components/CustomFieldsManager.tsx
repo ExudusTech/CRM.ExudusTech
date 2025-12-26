@@ -18,6 +18,38 @@ interface CustomFieldsManagerProps {
   onRemoveField: (id: string) => void;
 }
 
+/**
+ * Componente React `CustomFieldsManager`.
+ *
+ * @param {CustomFieldsManagerProps} {
+  customFieldDefinitions,
+  newFieldLabel,
+  setNewFieldLabel,
+  newFieldType,
+  setNewFieldType,
+  newFieldOptions,
+  setNewFieldOptions,
+  editingId,
+  onStartEditing,
+  onCancelEditing,
+  onSaveField,
+  onRemoveField
+} - Parâmetro `{
+  customFieldDefinitions,
+  newFieldLabel,
+  setNewFieldLabel,
+  newFieldType,
+  setNewFieldType,
+  newFieldOptions,
+  setNewFieldOptions,
+  editingId,
+  onStartEditing,
+  onCancelEditing,
+  onSaveField,
+  onRemoveField
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const CustomFieldsManager: React.FC<CustomFieldsManagerProps> = ({
   customFieldDefinitions,
   newFieldLabel,

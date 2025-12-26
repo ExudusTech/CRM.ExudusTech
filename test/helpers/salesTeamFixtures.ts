@@ -47,9 +47,18 @@ export type SalesTeamFixtureBundle = {
   };
 };
 
+/**
+ * Classe `AuthAdminUnavailableError` do projeto.
+ */
 export class AuthAdminUnavailableError extends Error {
   name = 'AuthAdminUnavailableError';
-  constructor(message: string) {
+    /**
+   * Constrói uma instância de `AuthAdminUnavailableError`.
+   *
+   * @param {string} message - Parâmetro `message`.
+   * @returns {void} Não retorna valor.
+   */
+constructor(message: string) {
     super(message);
   }
 }
@@ -269,6 +278,10 @@ async function createActivity(params: {
   return row.id;
 }
 
+/**
+ * Função pública `createSalesTeamFixtures` do projeto.
+ * @returns {Promise<SalesTeamFixtureBundle>} Retorna um valor do tipo `Promise<SalesTeamFixtureBundle>`.
+ */
 export async function createSalesTeamFixtures(): Promise<SalesTeamFixtureBundle> {
   const runId = getRunId('sales-team');
 
@@ -417,6 +430,12 @@ export async function createSalesTeamFixtures(): Promise<SalesTeamFixtureBundle>
   }
 }
 
+/**
+ * Função pública `cleanupSalesTeamFixtures` do projeto.
+ *
+ * @param {SalesTeamFixtureBundle} fx - Parâmetro `fx`.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export async function cleanupSalesTeamFixtures(fx: SalesTeamFixtureBundle): Promise<void> {
   const supabase = getSupabaseAdminClient();
 

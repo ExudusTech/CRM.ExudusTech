@@ -18,6 +18,24 @@ interface ContactFormModalProps {
   defaultCompanyName?: string;
 }
 
+/**
+ * Componente React `ContactFormModalV2`.
+ *
+ * @param {ContactFormModalProps} {
+  isOpen,
+  onClose,
+  onSubmit,
+  editingContact,
+  defaultCompanyName = '',
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSubmit,
+  editingContact,
+  defaultCompanyName = '',
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ContactFormModalV2: React.FC<ContactFormModalProps> = ({
   isOpen,
   onClose,

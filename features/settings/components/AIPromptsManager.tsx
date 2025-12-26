@@ -37,6 +37,12 @@ function extractVariablesFromNotes(notes?: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Componente React `AIPromptsManager`.
+ *
+ * @param {Props} { isAdmin } - Parâmetro `{ isAdmin }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AIPromptsManager: React.FC<Props> = ({ isAdmin }) => {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);

@@ -6,6 +6,10 @@ import { supabase } from '@/lib/supabase';
 import { isE164, normalizePhoneE164 } from '@/lib/phone';
 import { Loader2, User, Mail, Shield, Calendar, Key, Check, Eye, EyeOff, Phone, Pencil, Save, Camera, X } from 'lucide-react';
 
+/**
+ * Componente React `ProfilePage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ProfilePage: React.FC = () => {
     const { profile, refreshProfile } = useAuth();
 

@@ -10,6 +10,24 @@ interface TagsManagerProps {
   onRemoveTag: (tag: string) => void;
 }
 
+/**
+ * Componente React `TagsManager`.
+ *
+ * @param {TagsManagerProps} {
+  availableTags,
+  newTagName,
+  setNewTagName,
+  onAddTag,
+  onRemoveTag
+} - Parâmetro `{
+  availableTags,
+  newTagName,
+  setNewTagName,
+  onAddTag,
+  onRemoveTag
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const TagsManager: React.FC<TagsManagerProps> = ({
   availableTags,
   newTagName,

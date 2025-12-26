@@ -13,6 +13,12 @@ const isTestRouteEnabled =
     process.env.NODE_ENV === 'development' &&
     String(process.env.ALLOW_AI_TEST_ROUTE).toLowerCase() === 'true';
 
+/**
+ * Handler HTTP `POST` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; tool: any; context: { boardId: any; stageName: any; }; stage: { id: any; name: any; label: any; }; dealsCount: number; deals: { ...; }[]; }>>} Retorna um valor do tipo `Promise<NextResponse<{ error: string; }> | NextResponse<{ success: boolean; tool: any; context: { boardId: any; stageName: any; }; stage: { id: any; name: any; label: any; }; dealsCount: number; deals: { ...; }[]; }>>`.
+ */
 export async function POST(req: Request) {
     // Dev-only guard: this endpoint uses the Supabase Service Role key.
     // Deny by default in all environments.

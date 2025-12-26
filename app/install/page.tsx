@@ -7,6 +7,10 @@ import { Loader2 } from 'lucide-react';
 const STORAGE_TOKEN = 'crm_install_token';
 const STORAGE_PROJECT = 'crm_install_project';
 
+/**
+ * Componente React `InstallEntryPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function InstallEntryPage() {
   const router = useRouter();
 

@@ -117,6 +117,10 @@ const ACTION_LABELS: Record<string, string> = {
   USER_DELETED: 'Usuário Excluído',
 };
 
+/**
+ * Componente React `AuditLogDashboard`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const AuditLogDashboard: React.FC = () => {
   const { profile } = useAuth();
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);

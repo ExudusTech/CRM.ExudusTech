@@ -232,6 +232,42 @@ const AISuggestionsCard: React.FC<{
   );
 };
 
+/**
+ * Componente React `InboxListView`.
+ *
+ * @param {InboxListViewProps} {
+  overdueActivities,
+  todayMeetings,
+  todayTasks,
+  upcomingActivities,
+  aiSuggestions,
+  onCompleteActivity,
+  onSnoozeActivity,
+  onDiscardActivity,
+  onAcceptSuggestion,
+  onDismissSuggestion,
+  onSnoozeSuggestion,
+  onSelectActivity,
+  suggestionsDefaultOpen,
+  suggestionsDefaultShowAll,
+} - Parâmetro `{
+  overdueActivities,
+  todayMeetings,
+  todayTasks,
+  upcomingActivities,
+  aiSuggestions,
+  onCompleteActivity,
+  onSnoozeActivity,
+  onDiscardActivity,
+  onAcceptSuggestion,
+  onDismissSuggestion,
+  onSnoozeSuggestion,
+  onSelectActivity,
+  suggestionsDefaultOpen,
+  suggestionsDefaultShowAll,
+}`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const InboxListView: React.FC<InboxListViewProps> = ({
   overdueActivities,
   todayMeetings,

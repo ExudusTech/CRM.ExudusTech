@@ -11,6 +11,24 @@ interface SelectBoardModalProps {
   contactName: string;
 }
 
+/**
+ * Componente React `SelectBoardModal`.
+ *
+ * @param {SelectBoardModalProps} {
+  isOpen,
+  onClose,
+  onSelect,
+  boards,
+  contactName,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSelect,
+  boards,
+  contactName,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
   isOpen,
   onClose,
@@ -32,6 +50,10 @@ export const SelectBoardModal: React.FC<SelectBoardModalProps> = ({
         aria-modal="true"
         aria-labelledby={headingId}
         aria-describedby={descriptionId}
+        onClick={(e) => {
+          // Close only when clicking the backdrop (outside the panel).
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
         <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
           {/* Header */}

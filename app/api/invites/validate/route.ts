@@ -7,6 +7,12 @@ function json<T>(body: T, status = 200): Response {
   });
 }
 
+/**
+ * Handler HTTP `GET` deste endpoint (Next.js Route Handler).
+ *
+ * @param {Request} req - Objeto da requisição.
+ * @returns {Promise<Response>} Retorna um valor do tipo `Promise<Response>`.
+ */
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const token = url.searchParams.get('token');

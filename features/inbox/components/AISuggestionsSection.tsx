@@ -55,6 +55,22 @@ const getTypeConfig = (type: AISuggestionType) => {
   }
 };
 
+/**
+ * Componente React `AISuggestionsSection`.
+ *
+ * @param {AISuggestionsSectionProps} {
+  suggestions,
+  onAccept,
+  onDismiss,
+  onSnooze
+} - Parâmetro `{
+  suggestions,
+  onAccept,
+  onDismiss,
+  onSnooze
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const AISuggestionsSection: React.FC<AISuggestionsSectionProps> = ({
   suggestions,
   onAccept,

@@ -1276,6 +1276,10 @@ export function UIChat({
 }
 
 // Export a floating version that can be added to layout
+/**
+ * Componente React `FloatingAIChat`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export function FloatingAIChat() {
     const [isVisible, setIsVisible] = useState(true);
 

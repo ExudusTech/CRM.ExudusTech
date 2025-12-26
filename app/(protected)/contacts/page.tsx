@@ -8,6 +8,10 @@ const ContactsPage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Contacts`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Contacts() {
     return <ContactsPage />
 }

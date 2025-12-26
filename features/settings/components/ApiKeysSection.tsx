@@ -5,6 +5,10 @@ import { useOptionalToast } from '@/context/ToastContext';
 
 import { SettingsSection } from './SettingsSection';
 
+/**
+ * Componente React `ApiKeysSection`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const ApiKeysSection: React.FC = () => {
   const { addToast } = useOptionalToast();
 

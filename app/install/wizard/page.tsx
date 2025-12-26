@@ -51,6 +51,10 @@ function maskValue(value: string, start = 4, end = 4) {
   return `${trimmed.slice(0, start)}...${trimmed.slice(-end)}`;
 }
 
+/**
+ * Componente React `InstallWizardPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function InstallWizardPage() {
   const router = useRouter();
   const [meta, setMeta] = useState<InstallerMeta | null>(null);

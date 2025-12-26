@@ -21,6 +21,28 @@ interface ActivityFormModalProps {
   deals: Deal[];
 }
 
+/**
+ * Componente React `ActivityFormModal`.
+ *
+ * @param {ActivityFormModalProps} {
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
+  editingActivity,
+  deals,
+} - Parâmetro `{
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  setFormData,
+  editingActivity,
+  deals,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
   isOpen,
   onClose,
@@ -33,8 +55,17 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+      onClick={(e) => {
+        // Close only when clicking the backdrop (outside the panel).
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
           <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">
             {editingActivity ? 'Editar Atividade' : 'Nova Atividade'}

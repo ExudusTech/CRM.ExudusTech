@@ -44,6 +44,12 @@ interface BoardsContextType {
 
 const BoardsContext = createContext<BoardsContextType | undefined>(undefined);
 
+/**
+ * Componente React `BoardsProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const BoardsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
@@ -245,6 +251,10 @@ export const BoardsProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   return <BoardsContext.Provider value={value}>{children}</BoardsContext.Provider>;
 };
 
+/**
+ * Hook React `useBoards` que encapsula uma lógica reutilizável.
+ * @returns {BoardsContextType} Retorna um valor do tipo `BoardsContextType`.
+ */
 export const useBoards = () => {
   const context = useContext(BoardsContext);
   if (context === undefined) {

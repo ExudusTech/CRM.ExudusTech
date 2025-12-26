@@ -11,6 +11,12 @@ function needsSsl(connectionString: string) {
   return !/sslmode=disable/i.test(connectionString);
 }
 
+/**
+ * Função pública `runSchemaMigration` do projeto.
+ *
+ * @param {string} dbUrl - Parâmetro `dbUrl`.
+ * @returns {Promise<void>} Retorna uma Promise resolvida sem valor.
+ */
 export async function runSchemaMigration(dbUrl: string) {
   const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf8');
 

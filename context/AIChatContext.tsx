@@ -22,6 +22,12 @@ interface AIChatContextProviderState {
 
 const AIChatContextValue = createContext<AIChatContextProviderState | null>(null);
 
+/**
+ * Componente React `AIChatContextProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export function AIChatContextProvider({ children }: { children: ReactNode }) {
     const [context, setContextState] = useState<AIChatContext>({});
 
@@ -59,6 +65,10 @@ export function AIChatContextProvider({ children }: { children: ReactNode }) {
     );
 }
 
+/**
+ * Hook React `useAIChatContext` que encapsula uma lógica reutilizável.
+ * @returns {AIChatContextProviderState} Retorna um valor do tipo `AIChatContextProviderState`.
+ */
 export function useAIChatContext() {
     const ctx = useContext(AIChatContextValue);
     if (!ctx) {
@@ -68,6 +78,10 @@ export function useAIChatContext() {
 }
 
 // Optional hook that doesn't throw if not in provider
+/**
+ * Hook React `useAIChatContextOptional` que encapsula uma lógica reutilizável.
+ * @returns {AIChatContextProviderState | null} Retorna um valor do tipo `AIChatContextProviderState | null`.
+ */
 export function useAIChatContextOptional() {
     return useContext(AIChatContextValue);
 }

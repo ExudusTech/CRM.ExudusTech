@@ -130,6 +130,12 @@ function guessWonLostStageIds(stages: BoardStage[]) {
   return { wonStageId: won, lostStageId: lost };
 }
 
+/**
+ * Componente React `ExportTemplateModal`.
+ *
+ * @param {{ isOpen: boolean; onClose: () => void; boards: Board[]; activeBoard: Board; onCreateBoardAsync?: ((board: Omit<Board, "id" | "createdAt">, order?: number | undefined) => Promise<...>) | undefined; }} props - Parâmetro `props`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export function ExportTemplateModal(props: {
   isOpen: boolean;
   onClose: () => void;

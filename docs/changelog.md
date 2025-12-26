@@ -1,5 +1,29 @@
 # Changelog
 
+## 26/12/2025
+
+- **Documentação (JSDoc em pt-BR)**:
+  - Adicionada cobertura de docstrings (JSDoc) para **funções, classes e métodos públicos/exportados** no repositório.
+  - Incluído o script `scripts/add-jsdoc.mjs` para manter/atualizar a cobertura automaticamente.
+- **README**:
+  - Reescrito para servir como guia completo de onboarding (setup, env vars, scripts, arquitetura e referências).
+- **Integrações (Webhooks “produto”)**:
+  - Criada uma UI leigo-friendly em **Configurações → Webhooks** para ativar **Entrada de Leads** (seleciona Board + Estágio e entrega URL/Secret/cURL prontos).
+  - Adicionada configuração de **Follow-up (Webhook de saída)** para notificar sistemas externos quando um deal muda de etapa.
+  - Migration `supabase/migrations/20251226010000_integrations_webhooks_product.sql` adiciona tabelas de configuração/auditoria e trigger de mudança de estágio.
+  - Edge Function `supabase/functions/webhook-in` implementa o endpoint público de entrada com `X-Webhook-Secret`.
+- **Contatos (Importar/Exportar CSV)**:
+  - Botão de **Importar/Exportar** no header de **Contatos → Pessoas**, abrindo modal com abas de import/export.
+  - Exportação via endpoint `GET /api/contacts/export` respeitando **filtros/pesquisa/ordenação** atuais.
+  - Importação via endpoint `POST /api/contacts/import` com:
+    - detecção de delimitador (`,`/`;`/TAB), suporte a cabeçalhos comuns e normalização de `status`/`stage`;
+    - dedupe por email (atualizar / ignorar duplicados / sempre criar) e opção de **criar empresas** pelo nome.
+  - Template CSV e download de **relatório de erros** (com número da linha).
+  - Ajuste de layout: texto do checkbox “Criar empresa…” agora não “quebra”/desalinha o `<code>company</code>` no modal.
+  - UX: copy do checkbox de importação esclarece o comportamento (criar/vincular empresa via coluna `company` vs importar sem vínculo).
+  - Fix (UX): modais de Contatos voltaram a **fechar ao clicar fora** (backdrop click), além de `Esc`.
+  - UX (Modais): padronizado “clicar fora fecha” em modais/overlays do app, **mantendo travado apenas o Inbox Focus (preview)**.
+
 ## 25/12/2025
 
 - **Settings (IA)**:
@@ -147,3 +171,14 @@
   - Melhoria de UX: refatoração visual inspirada no template da Vercel (`vercel-labs/ai-sdk-preview-rsc-genui`): coluna central fixa (~520px), feed em estilo “linhas com ícone” (menos bolhas pesadas), empty-state + suggested actions e paleta `zinc` para um visual mais limpo.
   - Paridade com o template da Vercel: adicionadas dependências **`sonner`** (Toaster/toasts) e **`streamdown`** (renderização de Markdown), animações com **`framer-motion`** e hook de **scroll-to-bottom** no chat.
   - Streaming de texto alinhado ao exemplo oficial: uso de `createStreamableValue` + `useStreamableValue` para renderizar conteúdo em tempo real com Markdown durante `streamUI`.
+
+## 26/12/2025
+
+- **Dashboard/Relatórios (Navegação)**:
+  - Correção dos cards de KPI e CTA de “Configurar” para navegar para **`/boards`** (rota válida do pipeline) em vez de **`/pipeline`** (rota ausente).
+  - Adicionado alias **`/pipeline → /boards`** via redirect preservando querystring (`status`, `view`, `deal`, etc.) para compatibilidade com links antigos.
+
+- **Deals (Tags)**:
+  - Adicionado editor de **tags do negócio** no `DealDetailModal` (chips + adicionar/remover).
+  - Sugestões de tags reutilizam `crm_tags` (localStorage) e novas tags criadas no modal passam a alimentar a lista de sugestões.
+  - Refinamento de UI: botão de adicionar tag agora é **compacto (ícone)** e alinhado ao input (melhor no mobile).

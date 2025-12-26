@@ -15,6 +15,20 @@ interface MaintenanceBannerProps {
   onDismiss?: () => void;
 }
 
+/**
+ * Componente React `MaintenanceBanner`.
+ *
+ * @param {MaintenanceBannerProps} {
+  show = true,
+  message = '🔒 Funcionalidades de IA temporariamente desativadas para atualizações de segurança. Voltarão em breve.',
+  onDismiss,
+} - Parâmetro `{
+  show = true,
+  message = '🔒 Funcionalidades de IA temporariamente desativadas para atualizações de segurança. Voltarão em breve.',
+  onDismiss,
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const MaintenanceBanner: React.FC<MaintenanceBannerProps> = ({
   show = true,
   message = '🔒 Funcionalidades de IA temporariamente desativadas para atualizações de segurança. Voltarão em breve.',

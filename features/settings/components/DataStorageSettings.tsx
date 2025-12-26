@@ -10,6 +10,10 @@ import { useToast } from '@/context/ToastContext';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 
+/**
+ * Componente React `DataStorageSettings`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const DataStorageSettings: React.FC = () => {
     const { deals, contacts, companies, activities, boards, refresh } = useCRM();
     const { profile } = useAuth();

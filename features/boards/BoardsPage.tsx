@@ -4,6 +4,10 @@ import { PipelineView } from './components/PipelineView';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { useFirstVisit } from '@/hooks/useFirstVisit';
 
+/**
+ * Componente React `BoardsPage`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const BoardsPage: React.FC = () => {
     const controller = useBoardsController();
     const { isFirstVisit, completeOnboarding } = useFirstVisit();

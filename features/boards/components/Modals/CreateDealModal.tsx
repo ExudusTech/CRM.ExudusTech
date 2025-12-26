@@ -15,6 +15,22 @@ interface CreateDealModalProps {
     activeBoardId?: string;
 }
 
+/**
+ * Componente React `CreateDealModal`.
+ *
+ * @param {CreateDealModalProps} {
+    isOpen,
+    onClose,
+    activeBoard: propActiveBoard,
+    activeBoardId: propActiveBoardId
+} - Parâmetro `{
+    isOpen,
+    onClose,
+    activeBoard: propActiveBoard,
+    activeBoardId: propActiveBoardId
+}`.
+ * @returns {Element | null} Retorna um valor do tipo `Element | null`.
+ */
 export const CreateDealModal: React.FC<CreateDealModalProps> = ({
     isOpen,
     onClose,
@@ -120,8 +136,17 @@ export const CreateDealModal: React.FC<CreateDealModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+            onClick={(e) => {
+                // Close only when clicking the backdrop (outside the panel).
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
+            <div
+                className="bg-white dark:bg-dark-card border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <h2 className="text-lg font-bold text-slate-900 dark:text-white font-display">Novo Negócio</h2>

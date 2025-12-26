@@ -8,6 +8,10 @@ const ActivitiesPage = dynamic(
     { loading: () => <PageLoader />, ssr: false }
 )
 
+/**
+ * Componente React `Activities`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export default function Activities() {
     return <ActivitiesPage />
 }

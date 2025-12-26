@@ -98,6 +98,12 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
+/**
+ * Componente React `SettingsProvider`.
+ *
+ * @param {{ children: ReactNode; }} { children } - Parâmetro `{ children }`.
+ * @returns {Element} Retorna um valor do tipo `Element`.
+ */
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
 
@@ -577,6 +583,10 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 };
 
+/**
+ * Hook React `useSettings` que encapsula uma lógica reutilizável.
+ * @returns {SettingsContextType} Retorna um valor do tipo `SettingsContextType`.
+ */
 export const useSettings = () => {
   const context = useContext(SettingsContext);
   if (context === undefined) {

@@ -27,6 +27,10 @@ export interface UseAIEnabledResult {
   goToSettings: () => void;
 }
 
+/**
+ * Hook React `useAIEnabled` que encapsula uma lógica reutilizável.
+ * @returns {UseAIEnabledResult} Retorna um valor do tipo `UseAIEnabledResult`.
+ */
 export function useAIEnabled(): UseAIEnabledResult {
   const router = useRouter();
   const { aiProvider, aiOrgEnabled, aiKeyConfigured } = useCRM();

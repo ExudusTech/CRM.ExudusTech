@@ -12,6 +12,10 @@ import {
 import { useDeals } from '@/lib/query/hooks/useDealsQuery';
 import { useRealtimeSync } from '@/lib/realtime/useRealtimeSync';
 
+/**
+ * Hook React `useActivitiesController` que encapsula uma lógica reutilizável.
+ * @returns {{ viewMode: "list" | "calendar"; setViewMode: Dispatch<SetStateAction<"list" | "calendar">>; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; ... 18 more ...; handleSubmit: (e: FormEvent<...>) => void; }} Retorna um valor do tipo `{ viewMode: "list" | "calendar"; setViewMode: Dispatch<SetStateAction<"list" | "calendar">>; searchTerm: string; setSearchTerm: Dispatch<SetStateAction<string>>; ... 18 more ...; handleSubmit: (e: FormEvent<...>) => void; }`.
+ */
 export const useActivitiesController = () => {
   const searchParams = useSearchParams();
 

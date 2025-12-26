@@ -47,6 +47,10 @@ export interface FocusItem {
   data: Activity | AISuggestion;
 }
 
+/**
+ * Hook React `useInboxController` que encapsula uma lógica reutilizável.
+ * @returns {{ isLoading: boolean; viewMode: ViewMode; setViewMode: Dispatch<SetStateAction<ViewMode>>; briefing: string | null; isGeneratingBriefing: boolean; ... 23 more ...; handleSelectActivity: (id: string) => void; }} Retorna um valor do tipo `{ isLoading: boolean; viewMode: ViewMode; setViewMode: Dispatch<SetStateAction<ViewMode>>; briefing: string | null; isGeneratingBriefing: boolean; ... 23 more ...; handleSelectActivity: (id: string) => void; }`.
+ */
 export const useInboxController = () => {
   // Auth (single-tenant com multiusuário). Mantemos profile para permissões/owner.
   const { profile } = useAuth();
