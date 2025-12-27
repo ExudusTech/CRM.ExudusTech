@@ -532,9 +532,18 @@ export const ApiKeysSection: React.FC = () => {
           </div>
 
           {action === 'create_lead' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <div className="text-xs text-slate-600 dark:text-slate-300 mb-3">
+                <span className="font-semibold text-slate-700 dark:text-slate-200">*</span> Obrigatório: <span className="font-semibold text-slate-700 dark:text-slate-200">Email</span> <span className="font-semibold">ou</span>{' '}
+                <span className="font-semibold text-slate-700 dark:text-slate-200">Telefone</span>. <span className="font-semibold text-slate-700 dark:text-slate-200">Nome</span> é obrigatório apenas ao{' '}
+                <span className="font-semibold text-slate-700 dark:text-slate-200">criar</span> um contato novo.
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Nome</div>
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+                  Nome <span className="text-slate-500 dark:text-slate-400">*</span>
+                </div>
                 <input
                   value={leadName}
                   onChange={(e) => setLeadName(e.target.value)}
@@ -552,7 +561,9 @@ export const ApiKeysSection: React.FC = () => {
                 />
               </div>
               <div>
-                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Email</div>
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+                  Email <span className="text-slate-500 dark:text-slate-400">*</span>
+                </div>
                 <input
                   value={leadEmail}
                   onChange={(e) => setLeadEmail(e.target.value)}
@@ -561,7 +572,9 @@ export const ApiKeysSection: React.FC = () => {
                 />
               </div>
               <div>
-                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Telefone (E.164)</div>
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">
+                  Telefone (E.164) <span className="text-slate-500 dark:text-slate-400">*</span>
+                </div>
                 <input
                   value={leadPhone}
                   onChange={(e) => setLeadPhone(e.target.value)}
@@ -595,6 +608,7 @@ export const ApiKeysSection: React.FC = () => {
                   className="w-full px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white min-h-[92px]"
                   placeholder="Opcional"
                 />
+              </div>
               </div>
             </div>
           )}
