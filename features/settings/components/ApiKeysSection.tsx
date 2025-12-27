@@ -48,6 +48,9 @@ export const ApiKeysSection: React.FC = () => {
   const [leadEmail, setLeadEmail] = useState<string>('teste@exemplo.com');
   const [leadPhone, setLeadPhone] = useState<string>('+5511999999999');
   const [leadSource, setLeadSource] = useState<string>('n8n');
+  const [leadRole, setLeadRole] = useState<string>('Gerente');
+  const [leadCompanyName, setLeadCompanyName] = useState<string>('Empresa Teste');
+  const [leadNotes, setLeadNotes] = useState<string>('');
   const [activityType, setActivityType] = useState<string>('NOTE');
   const [activityTitle, setActivityTitle] = useState<string>('Nota via integração');
   const [actionTestLoading, setActionTestLoading] = useState(false);
@@ -235,7 +238,13 @@ export const ApiKeysSection: React.FC = () => {
       const email = (leadEmail || 'teste@exemplo.com').replaceAll('"', '\\"');
       const phone = (leadPhone || '+5511999999999').replaceAll('"', '\\"');
       const source = (leadSource || 'n8n').replaceAll('"', '\\"');
-      return `curl -X POST '${contactsUrl}' \\\n+  -H 'Content-Type: application/json' \\\n+  -H 'X-Api-Key: ${token}' \\\n+  -d '{\n+    \"name\": \"${name}\",\n+    \"email\": \"${email}\",\n+    \"phone\": \"${phone}\",\n+    \"source\": \"${source}\"\n+  }'`;
+      const role = (leadRole || '').replaceAll('"', '\\"');
+      const companyName = (leadCompanyName || '').replaceAll('"', '\\"');
+      const notes = (leadNotes || '').replaceAll('"', '\\"');
+      const roleLine = role ? `,\\n+    \\\"role\\\": \\\"${role}\\\"` : '';
+      const companyLine = companyName ? `,\\n+    \\\"company_name\\\": \\\"${companyName}\\\"` : '';
+      const notesLine = notes ? `,\\n+    \\\"notes\\\": \\\"${notes}\\\"` : '';
+      return `curl -X POST '${contactsUrl}' \\\n+  -H 'Content-Type: application/json' \\\n+  -H 'X-Api-Key: ${token}' \\\n+  -d '{\n+    \"name\": \"${name}\",\n+    \"email\": \"${email}\",\n+    \"phone\": \"${phone}\",\n+    \"source\": \"${source}\"${roleLine}${companyLine}${notesLine}\n+  }'`;
     }
     if (action === 'create_deal') {
       const boardKey = selectedBoardKey || 'board-key';
@@ -267,6 +276,9 @@ export const ApiKeysSection: React.FC = () => {
     leadEmail,
     leadPhone,
     leadSource,
+    leadRole,
+    leadCompanyName,
+    leadNotes,
     identityMode,
     identityPhone,
     identityEmail,
@@ -295,6 +307,9 @@ export const ApiKeysSection: React.FC = () => {
             email: leadEmail || `teste+${Date.now()}@exemplo.com`,
             phone: leadPhone || '+5511999999999',
             source: leadSource || 'ui-test',
+            role: leadRole || undefined,
+            company_name: leadCompanyName || undefined,
+            notes: leadNotes || undefined,
           }),
         });
         const json = await res.json().catch(() => ({}));
@@ -552,6 +567,33 @@ export const ApiKeysSection: React.FC = () => {
                   onChange={(e) => setLeadPhone(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white font-mono"
                   placeholder="+5511999999999"
+                />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Cargo</div>
+                <input
+                  value={leadRole}
+                  onChange={(e) => setLeadRole(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
+                  placeholder="Ex: Gerente"
+                />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Empresa</div>
+                <input
+                  value={leadCompanyName}
+                  onChange={(e) => setLeadCompanyName(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white"
+                  placeholder="Nome da Empresa"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-200 mb-1">Notas</div>
+                <textarea
+                  value={leadNotes}
+                  onChange={(e) => setLeadNotes(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-900 dark:text-white min-h-[92px]"
+                  placeholder="Opcional"
                 />
               </div>
             </div>

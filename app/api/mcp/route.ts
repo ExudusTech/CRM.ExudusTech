@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { authPublicApi } from '@/lib/public-api/auth';
 import { createStaticAdminClient } from '@/lib/supabase/server';
-import { isValidUUID } from '@/lib/supabase/utils';
+import { buildCrmMcpRegistry } from '@/lib/mcp/crmRegistry';
+import { zodToJsonSchema2020 } from '@/lib/mcp/zodToJsonSchema';
 
 export const runtime = 'nodejs';
 
@@ -43,130 +44,32 @@ async function authMcp(request: Request) {
   return await authPublicApi(normalized);
 }
 
-function toolText(json: unknown) {
+function toToolResult(payload: unknown, opts?: { isError?: boolean }) {
+  const isError = !!opts?.isError || (payload && typeof payload === 'object' && !Array.isArray(payload) && 'error' in (payload as any));
+  const text = JSON.stringify(payload, null, 2);
+
+  // MCP guidance: when returning structuredContent, also include serialized JSON in a text block.
+  const structuredContent =
+    payload && typeof payload === 'object' && !Array.isArray(payload) ? (payload as Record<string, unknown>) : undefined;
+
   return {
-    content: [{ type: 'text', text: JSON.stringify(json, null, 2) }],
+    content: [{ type: 'text', text }],
+    ...(structuredContent ? { structuredContent } : {}),
+    isError,
   };
 }
 
-const TOOLS = [
-  {
-    name: 'crm_get_me',
-    description: 'Returns the organization context for the current API key.',
-    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-  },
-  {
-    name: 'crm_search_deals',
-    description: 'Search deals by title (substring match) within the authenticated organization.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        q: { type: 'string', description: 'Search query (matches deal title)' },
-        limit: { type: 'number', description: 'Max number of deals to return (default 20, max 50)' },
-      },
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'crm_get_deal',
-    description: 'Get a deal by id within the authenticated organization.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        dealId: { type: 'string', description: 'Deal UUID' },
-      },
-      required: ['dealId'],
-      additionalProperties: false,
-    },
-  },
-] as const;
-
-async function handleToolsCall(opts: { toolName: string; args: any; auth: { organizationId: string; organizationName: string } }) {
+async function resolveApiKeyOwnerUserId(opts: { apiKeyId: string; organizationId: string }) {
   const sb = createStaticAdminClient();
+  const { data, error } = await sb
+    .from('api_keys')
+    .select('id, organization_id, created_by')
+    .eq('id', opts.apiKeyId)
+    .maybeSingle();
 
-  if (opts.toolName === 'crm_get_me') {
-    return toolText({
-      organization_id: opts.auth.organizationId,
-      organization_name: opts.auth.organizationName,
-    });
-  }
-
-  if (opts.toolName === 'crm_search_deals') {
-    const q = typeof opts.args?.q === 'string' ? opts.args.q.trim() : '';
-    const limitRaw = typeof opts.args?.limit === 'number' ? opts.args.limit : 20;
-    const limit = Math.max(1, Math.min(50, Math.floor(limitRaw)));
-
-    let query = sb
-      .from('deals')
-      .select('id,title,value,board_id,stage_id,contact_id,client_company_id,is_won,is_lost,loss_reason,closed_at,created_at,updated_at')
-      .eq('organization_id', opts.auth.organizationId)
-      .is('deleted_at', null)
-      .order('updated_at', { ascending: false })
-      .limit(limit);
-
-    if (q) query = query.ilike('title', `%${q}%`);
-
-    const { data, error } = await query;
-    if (error) {
-      return toolText({ error: error.message, code: 'DB_ERROR' });
-    }
-
-    return toolText({
-      deals: (data || []).map((d: any) => ({
-        id: d.id,
-        title: d.title,
-        value: Number(d.value ?? 0),
-        board_id: d.board_id,
-        stage_id: d.stage_id,
-        contact_id: d.contact_id,
-        client_company_id: d.client_company_id ?? null,
-        is_won: !!d.is_won,
-        is_lost: !!d.is_lost,
-        loss_reason: d.loss_reason ?? null,
-        closed_at: d.closed_at ?? null,
-        created_at: d.created_at,
-        updated_at: d.updated_at,
-      })),
-    });
-  }
-
-  if (opts.toolName === 'crm_get_deal') {
-    const dealId = opts.args?.dealId;
-    if (!isValidUUID(dealId)) {
-      return toolText({ error: 'dealId must be a valid UUID', code: 'VALIDATION_ERROR' });
-    }
-
-    const { data, error } = await sb
-      .from('deals')
-      .select('id,title,value,board_id,stage_id,contact_id,client_company_id,is_won,is_lost,loss_reason,closed_at,created_at,updated_at')
-      .eq('organization_id', opts.auth.organizationId)
-      .eq('id', dealId)
-      .is('deleted_at', null)
-      .maybeSingle();
-
-    if (error) return toolText({ error: error.message, code: 'DB_ERROR' });
-    if (!data) return toolText({ error: 'Deal not found', code: 'NOT_FOUND' });
-
-    return toolText({
-      deal: {
-        id: data.id,
-        title: data.title,
-        value: Number((data as any).value ?? 0),
-        board_id: (data as any).board_id,
-        stage_id: (data as any).stage_id,
-        contact_id: (data as any).contact_id,
-        client_company_id: (data as any).client_company_id ?? null,
-        is_won: !!(data as any).is_won,
-        is_lost: !!(data as any).is_lost,
-        loss_reason: (data as any).loss_reason ?? null,
-        closed_at: (data as any).closed_at ?? null,
-        created_at: (data as any).created_at,
-        updated_at: (data as any).updated_at,
-      },
-    });
-  }
-
-  return toolText({ error: `Unknown tool: ${opts.toolName}`, code: 'UNKNOWN_TOOL' });
+  if (error || !data) return null;
+  if (data.organization_id !== opts.organizationId) return null;
+  return data.created_by as string | null;
 }
 
 export async function GET() {
@@ -175,6 +78,7 @@ export async function GET() {
     name: 'crmia-next-mcp',
     endpoint: '/api/mcp',
     auth: 'Authorization: Bearer <API_KEY> (or X-Api-Key header)',
+    protocolVersion: '2025-11-25',
   });
 }
 
@@ -190,13 +94,27 @@ export async function POST(request: Request) {
     return NextResponse.json(jsonRpcError(null, -32600, 'Invalid Request'), { status: 400 });
   }
 
-  // MCP core methods (minimal set to work with common MCP clients / Inspector)
+  const userId = await resolveApiKeyOwnerUserId({ apiKeyId: auth.apiKeyId, organizationId: auth.organizationId });
+  if (!userId) {
+    return NextResponse.json(
+      { jsonrpc: '2.0', id: body.id ?? null, error: { code: -32001, message: 'Invalid API key owner', data: { code: 'AUTH_OWNER_INVALID' } } },
+      { status: 401 }
+    );
+  }
+
+  // Minimal context for MCP execution. Tool args can still include boardId/dealId/etc.
+  const registry = buildCrmMcpRegistry({
+    context: { organizationId: auth.organizationId },
+    userId,
+  });
+
+  // MCP core methods
   if (body.method === 'initialize') {
     return NextResponse.json(
       jsonRpcResult(body.id, {
-        protocolVersion: '2025-06-18',
+        protocolVersion: '2025-11-25',
         serverInfo: { name: 'crmia-next-mcp', version: '0.1.0' },
-        capabilities: { tools: {}, resources: {} },
+        capabilities: { tools: { listChanged: false } },
       })
     );
   }
@@ -207,7 +125,14 @@ export async function POST(request: Request) {
   }
 
   if (body.method === 'tools/list') {
-    return NextResponse.json(jsonRpcResult(body.id, { tools: TOOLS }));
+    const tools = registry.tools.map((t) => ({
+      name: t.name,
+      title: t.title,
+      description: t.description,
+      inputSchema: zodToJsonSchema2020(t.inputSchemaZod),
+    }));
+
+    return NextResponse.json(jsonRpcResult(body.id, { tools }));
   }
 
   if (body.method === 'tools/call') {
@@ -217,13 +142,35 @@ export async function POST(request: Request) {
       return NextResponse.json(jsonRpcError(body.id, -32602, 'Invalid params: missing tool name'), { status: 400 });
     }
 
-    const toolResult = await handleToolsCall({
-      toolName,
-      args,
-      auth: { organizationId: auth.organizationId, organizationName: auth.organizationName },
-    });
+    const tool = registry.toolByMcpName[toolName];
+    if (!tool) {
+      return NextResponse.json(jsonRpcError(body.id, -32602, `Unknown tool: ${toolName}`), { status: 400 });
+    }
 
-    return NextResponse.json(jsonRpcResult(body.id, toolResult));
+    // Validate inputs using the underlying Zod schema when available.
+    const schema: any = (tool as any).inputSchema;
+    if (schema && typeof schema.safeParse === 'function') {
+      const parsed = schema.safeParse(args);
+      if (!parsed.success) {
+        const msg = parsed.error?.issues?.map((i: any) => i?.message).filter(Boolean).join('; ') || 'Invalid tool arguments';
+        return NextResponse.json(jsonRpcResult(body.id, toToolResult({ error: msg }, { isError: true })));
+      }
+
+      try {
+        const out = await (tool as any).execute(parsed.data);
+        return NextResponse.json(jsonRpcResult(body.id, toToolResult(out)));
+      } catch (e: any) {
+        return NextResponse.json(jsonRpcResult(body.id, toToolResult({ error: e?.message || 'Tool execution failed' }, { isError: true })));
+      }
+    }
+
+    // No schema: best-effort execute.
+    try {
+      const out = await (tool as any).execute(args);
+      return NextResponse.json(jsonRpcResult(body.id, toToolResult(out)));
+    } catch (e: any) {
+      return NextResponse.json(jsonRpcResult(body.id, toToolResult({ error: e?.message || 'Tool execution failed' }, { isError: true })));
+    }
   }
 
   return NextResponse.json(jsonRpcError(body.id, -32601, `Method not found: ${body.method}`), { status: 404 });
