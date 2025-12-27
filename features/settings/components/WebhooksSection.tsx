@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Webhook, ArrowRight, Copy, Check, Link as LinkIcon } from 'lucide-react';
+import { Webhook, ArrowRight, Copy, Check, Link as LinkIcon, Pencil, Power, Trash2, KeyRound } from 'lucide-react';
 import { SettingsSection } from './SettingsSection';
 import { Modal } from '@/components/ui/Modal';
+import ConfirmModal from '@/components/ConfirmModal';
 import { useBoards } from '@/context/boards/BoardsContext';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +13,7 @@ type InboundSourceRow = {
   name: string;
   entry_board_id: string;
   entry_stage_id: string;
+  secret: string;
   active: boolean;
 };
 
@@ -19,6 +21,7 @@ type OutboundEndpointRow = {
   id: string;
   name: string;
   url: string;
+  secret: string;
   active: boolean;
 };
 
@@ -64,8 +67,10 @@ export const WebhooksSection: React.FC = () => {
   const [endpoint, setEndpoint] = useState<OutboundEndpointRow | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Wizard (1 passo)
+  // Wizard/Edit inbound (1 passo)
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [wizardMode, setWizardMode] = useState<'create' | 'edit'>('create');
+  const [editingSourceId, setEditingSourceId] = useState<string | null>(null);
   const defaultBoard = useMemo(() => boards.find(b => b.isDefault) || boards[0] || null, [boards]);
   const [selectedBoardId, setSelectedBoardId] = useState<string>('');
   const selectedBoard = useMemo(
@@ -87,33 +92,56 @@ export const WebhooksSection: React.FC = () => {
   const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
   const [followUpUrl, setFollowUpUrl] = useState('');
 
+  // Confirm modals
+  const [confirmDeleteInboundOpen, setConfirmDeleteInboundOpen] = useState(false);
+  const [confirmDeleteOutboundOpen, setConfirmDeleteOutboundOpen] = useState(false);
+
   const canUse = profile?.role === 'admin' && !!profile?.organization_id;
+
+  const activeInbound = useMemo(() => sources.find((s) => s.active) || sources[0] || null, [sources]);
+  const hasInbound = !!activeInbound && !!activeInbound.active;
+
+  const inboundBoardName = useMemo(() => {
+    if (!activeInbound) return null;
+    const b = boards.find((x) => x.id === activeInbound.entry_board_id);
+    return b?.name || null;
+  }, [activeInbound, boards]);
+
+  const inboundStageLabel = useMemo(() => {
+    if (!activeInbound) return null;
+    const b = boards.find((x) => x.id === activeInbound.entry_board_id);
+    const s = b?.stages?.find((x) => x.id === activeInbound.entry_stage_id);
+    return s?.label || null;
+  }, [activeInbound, boards]);
+
+  async function loadWebhooks() {
+    if (!canUse) return;
+    if (!supabase) return;
+    setLoading(true);
+    try {
+      const { data: srcData } = await supabase
+        .from('integration_inbound_sources')
+        .select('id,name,entry_board_id,entry_stage_id,secret,active')
+        .order('created_at', { ascending: false });
+      setSources((srcData as any) || []);
+
+      const { data: epData } = await supabase
+        .from('integration_outbound_endpoints')
+        .select('id,name,url,secret,active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setEndpoint((epData as any) || null);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   React.useEffect(() => {
     if (!canUse) return;
     if (!supabase) return;
 
-    (async () => {
-      setLoading(true);
-      try {
-        const { data: srcData } = await supabase
-          .from('integration_inbound_sources')
-          .select('id,name,entry_board_id,entry_stage_id,active')
-          .order('created_at', { ascending: false });
-        setSources((srcData as any) || []);
-
-        const { data: epData } = await supabase
-          .from('integration_outbound_endpoints')
-          .select('id,name,url,active')
-          .eq('active', true)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        setEndpoint((epData as any) || null);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadWebhooks();
   }, [canUse]);
 
   React.useEffect(() => {
@@ -165,7 +193,7 @@ export const WebhooksSection: React.FC = () => {
       setIsDoneOpen(true);
 
       // refresh list
-      setSources((prev) => [{ id: sourceId, name: 'Entrada de Leads', entry_board_id: selectedBoard.id, entry_stage_id: selectedStageId, active: true }, ...prev]);
+      setSources((prev) => [{ id: sourceId, name: 'Entrada de Leads', entry_board_id: selectedBoard.id, entry_stage_id: selectedStageId, secret, active: true }, ...prev]);
 
       if (createTestLead) {
         await fetch(url, {
@@ -193,39 +221,184 @@ export const WebhooksSection: React.FC = () => {
     }
   }
 
-  async function handleConnectFollowUp() {
+  async function handleSaveFollowUp() {
     if (!canUse) return;
     if (!followUpUrl.trim()) return;
 
-    const secret = generateSecret();
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('integration_outbound_endpoints')
-        .insert({
-          organization_id: profile!.organization_id,
-          name: 'Follow-up (Webhook)',
-          url: followUpUrl.trim(),
-          secret,
-          events: ['deal.stage_changed'],
-          active: true,
-        })
-        .select('id,name,url,active')
-        .single();
+      if (endpoint?.id) {
+        const { data, error } = await supabase
+          .from('integration_outbound_endpoints')
+          .update({
+            url: followUpUrl.trim(),
+          })
+          .eq('id', endpoint.id)
+          .select('id,name,url,secret,active')
+          .single();
+        if (error) throw error;
+        setEndpoint(data as any);
+        addToast('Follow-up atualizado!', 'success');
+      } else {
+        const secret = generateSecret();
+        const { data, error } = await supabase
+          .from('integration_outbound_endpoints')
+          .insert({
+            organization_id: profile!.organization_id,
+            name: 'Follow-up (Webhook)',
+            url: followUpUrl.trim(),
+            secret,
+            events: ['deal.stage_changed'],
+            active: true,
+          })
+          .select('id,name,url,secret,active')
+          .single();
 
-      if (error) throw error;
-      setEndpoint(data as any);
+        if (error) throw error;
+        setEndpoint(data as any);
+        addToast('Follow-up conectado!', 'success');
+      }
       setIsFollowUpOpen(false);
       setFollowUpUrl('');
-      addToast('Follow-up conectado!', 'success');
     } catch (e: any) {
-      addToast(e?.message || 'Erro ao conectar follow-up', 'error');
+      addToast(e?.message || 'Erro ao salvar follow-up', 'error');
     } finally {
       setLoading(false);
     }
   }
 
-  const hasInbound = sources.length > 0;
+  async function handleEditInbound() {
+    if (!activeInbound) return;
+    setWizardMode('edit');
+    setEditingSourceId(activeInbound.id);
+    setSelectedBoardId(activeInbound.entry_board_id);
+    setSelectedStageId(activeInbound.entry_stage_id);
+    setCreateTestLead(false);
+    setIsWizardOpen(true);
+  }
+
+  async function handleSaveInboundEdit() {
+    if (!canUse) return;
+    if (!editingSourceId) return;
+    if (!selectedBoard?.id || !selectedStageId) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('integration_inbound_sources')
+        .update({
+          entry_board_id: selectedBoard.id,
+          entry_stage_id: selectedStageId,
+        })
+        .eq('id', editingSourceId);
+      if (error) throw error;
+      addToast('Entrada de leads atualizada!', 'success');
+      await loadWebhooks();
+      setIsWizardOpen(false);
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao atualizar entrada de leads', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleToggleInboundActive(nextActive: boolean) {
+    if (!canUse) return;
+    if (!activeInbound) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('integration_inbound_sources')
+        .update({ active: nextActive })
+        .eq('id', activeInbound.id);
+      if (error) throw error;
+      addToast(nextActive ? 'Entrada de leads ativada!' : 'Entrada de leads desativada.', 'success');
+      await loadWebhooks();
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao atualizar status do webhook', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteInbound() {
+    if (!canUse) return;
+    if (!activeInbound) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('integration_inbound_sources')
+        .delete()
+        .eq('id', activeInbound.id);
+      if (error) throw error;
+      addToast('Configuração de entrada removida.', 'success');
+      await loadWebhooks();
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao excluir webhook', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleToggleOutboundActive(nextActive: boolean) {
+    if (!canUse) return;
+    if (!endpoint?.id) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('integration_outbound_endpoints')
+        .update({ active: nextActive })
+        .eq('id', endpoint.id);
+      if (error) throw error;
+      addToast(nextActive ? 'Follow-up ativado!' : 'Follow-up desativado.', 'success');
+      await loadWebhooks();
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao atualizar follow-up', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRegenerateOutboundSecret() {
+    if (!canUse) return;
+    if (!endpoint?.id) return;
+    const nextSecret = generateSecret();
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('integration_outbound_endpoints')
+        .update({ secret: nextSecret })
+        .eq('id', endpoint.id)
+        .select('id,name,url,secret,active')
+        .single();
+      if (error) throw error;
+      setEndpoint(data as any);
+      addToast('Secret do follow-up regenerado. Atualize no seu n8n/Make/WhatsApp.', 'success');
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao regenerar secret', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteOutbound() {
+    if (!canUse) return;
+    if (!endpoint?.id) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('integration_outbound_endpoints')
+        .delete()
+        .eq('id', endpoint.id);
+      if (error) throw error;
+      setEndpoint(null);
+      addToast('Follow-up removido.', 'success');
+    } catch (e: any) {
+      addToast(e?.message || 'Erro ao excluir follow-up', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SettingsSection title="Webhooks" icon={Webhook}>
@@ -254,26 +427,64 @@ export const WebhooksSection: React.FC = () => {
               </span>
             </div>
 
-            {hasInbound && sources[0] ? (
+            {activeInbound ? (
               <div className="mt-4 flex flex-col gap-2">
                 <div className="text-xs text-slate-500 dark:text-slate-400">
-                  Fonte: <span className="font-medium text-slate-700 dark:text-slate-200">{sources[0].name}</span>
+                  Fonte: <span className="font-medium text-slate-700 dark:text-slate-200">{activeInbound.name}</span>
+                  {inboundBoardName && inboundStageLabel ? (
+                    <>
+                      {' '}· <span className="text-slate-600 dark:text-slate-300">{inboundBoardName}</span>
+                      {' '}→ <span className="text-slate-600 dark:text-slate-300">{inboundStageLabel}</span>
+                    </>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
-                    onClick={() => copy(buildWebhookUrl(sources[0].id), 'url')}
+                    onClick={() => copy(buildWebhookUrl(activeInbound.id), 'url')}
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                   >
                     <Copy className="h-4 w-4" />
                     Copiar URL
                     {copiedKey === 'url' && <Check className="h-4 w-4 text-green-600" />}
                   </button>
+                  <button
+                    onClick={() => copy(activeInbound.secret, 'inboundSecret')}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    Copiar secret
+                    {copiedKey === 'inboundSecret' && <Check className="h-4 w-4 text-green-600" />}
+                  </button>
+                  <button
+                    onClick={handleEditInbound}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleToggleInboundActive(!activeInbound.active)}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                  >
+                    <Power className="h-4 w-4" />
+                    {activeInbound.active ? 'Desativar' : 'Ativar'}
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteInboundOpen(true)}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-60"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Excluir
+                  </button>
                 </div>
               </div>
             ) : (
               <div className="mt-4">
                 <button
-                  onClick={() => setIsWizardOpen(true)}
+                  onClick={() => { setWizardMode('create'); setEditingSourceId(null); setIsWizardOpen(true); }}
                   disabled={loading || boardsLoading || boards.length === 0}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                 >
@@ -298,11 +509,61 @@ export const WebhooksSection: React.FC = () => {
               </span>
             </div>
 
-            {endpoint?.active ? (
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+            {endpoint ? (
+              <div className="mt-4 flex flex-col gap-2">
                 <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
                   <LinkIcon className="h-4 w-4" />
                   <span className="font-mono truncate max-w-[520px]">{endpoint.url}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => copy(endpoint.url, 'outboundUrl')}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Copiar URL
+                    {copiedKey === 'outboundUrl' && <Check className="h-4 w-4 text-green-600" />}
+                  </button>
+                  <button
+                    onClick={() => copy(endpoint.secret, 'outboundSecret')}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    Copiar secret
+                    {copiedKey === 'outboundSecret' && <Check className="h-4 w-4 text-green-600" />}
+                  </button>
+                  <button
+                    onClick={() => { setFollowUpUrl(endpoint.url); setIsFollowUpOpen(true); }}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleToggleOutboundActive(!endpoint.active)}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                  >
+                    <Power className="h-4 w-4" />
+                    {endpoint.active ? 'Desativar' : 'Ativar'}
+                  </button>
+                  <button
+                    onClick={handleRegenerateOutboundSecret}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-colors disabled:opacity-60"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                    Regenerar secret
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteOutboundOpen(true)}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-60"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Excluir
+                  </button>
                 </div>
               </div>
             ) : (
@@ -325,7 +586,7 @@ export const WebhooksSection: React.FC = () => {
       <Modal
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
-        title="Ativar entrada de leads"
+        title={wizardMode === 'edit' ? 'Editar entrada de leads' : 'Ativar entrada de leads'}
         size="sm"
       >
         <div className="space-y-4">
@@ -365,14 +626,16 @@ export const WebhooksSection: React.FC = () => {
             </select>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-            <input
-              type="checkbox"
-              checked={createTestLead}
-              onChange={(e) => setCreateTestLead(e.target.checked)}
-            />
-            Criar um lead de teste ao finalizar
-          </label>
+          {wizardMode === 'create' ? (
+            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+              <input
+                type="checkbox"
+                checked={createTestLead}
+                onChange={(e) => setCreateTestLead(e.target.checked)}
+              />
+              Criar um lead de teste ao finalizar
+            </label>
+          ) : null}
 
           <div className="flex items-center justify-end gap-2 pt-2">
             <button
@@ -382,11 +645,11 @@ export const WebhooksSection: React.FC = () => {
               Cancelar
             </button>
             <button
-              onClick={handleActivateInbound}
+              onClick={wizardMode === 'edit' ? handleSaveInboundEdit : handleActivateInbound}
               disabled={loading || !selectedBoard?.id || !selectedStageId}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              Ativar agora
+              {wizardMode === 'edit' ? 'Salvar' : 'Ativar agora'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -473,7 +736,7 @@ export const WebhooksSection: React.FC = () => {
       <Modal
         isOpen={isFollowUpOpen}
         onClose={() => setIsFollowUpOpen(false)}
-        title="Conectar follow-up"
+        title={endpoint?.id ? 'Editar follow-up' : 'Conectar follow-up'}
         size="sm"
       >
         <div className="space-y-4">
@@ -498,16 +761,46 @@ export const WebhooksSection: React.FC = () => {
               Agora não
             </button>
             <button
-              onClick={handleConnectFollowUp}
+              onClick={handleSaveFollowUp}
               disabled={loading || !followUpUrl.trim()}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
             >
-              Conectar
+              {endpoint?.id ? 'Salvar' : 'Conectar'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={confirmDeleteInboundOpen}
+        onClose={() => setConfirmDeleteInboundOpen(false)}
+        onConfirm={handleDeleteInbound}
+        title="Excluir webhook de entrada?"
+        message={
+          <div>
+            Isso remove apenas a <b>configuração</b> do webhook (URL/secret param de entrada). Leads já criados no CRM não serão apagados.
+          </div>
+        }
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      />
+
+      <ConfirmModal
+        isOpen={confirmDeleteOutboundOpen}
+        onClose={() => setConfirmDeleteOutboundOpen(false)}
+        onConfirm={handleDeleteOutbound}
+        title="Excluir follow-up (webhook de saída)?"
+        message={
+          <div>
+            Isso remove apenas a <b>configuração</b> do follow-up. O CRM não enviará mais notificações quando o lead mudar de etapa.
+          </div>
+        }
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="danger"
+      />
     </SettingsSection>
   );
 };

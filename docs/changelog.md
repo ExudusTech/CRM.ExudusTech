@@ -17,6 +17,9 @@
     - Toggle por ícone padronizado: **ativo verde** / **desativado vermelho**.
     - Fix: editor de prompt dentro de “Funções de IA” agora carrega o **template padrão do catálogo** quando não existe override ativo (antes podia abrir vazio).
   - **Integrações → Webhooks**: corrigido exemplo de `curl` (remoção de caracteres `+` no output).
+  - **Integrações → Webhooks (UX)**:
+    - Adicionados botões para **Editar / Ativar-Desativar / Excluir** as configurações de webhook (entrada e follow-up).
+    - Exposição do **secret** para admin via “Copiar secret” (evita depender apenas do modal de “criado com sucesso”).
 - **Debug Mode (UX)**:
   - Debug agora é **reativo** (sem refresh): toggle dispara evento (`DEBUG_MODE_EVENT`) e `DebugFillButton` usa `useDebugMode`.
   - Fix: geração de telefone fake agora é determinística (sem `fromRegExp`, evitando `\\` no número).
@@ -36,6 +39,10 @@
     - Na aba **Empresas**, clicar no avatar em **“Pessoas Vinc.”** abre o modal de edição daquele contato.
 - **Inbox (UX)**:
   - Empty-state **“Inbox Zero”** agora aparece também na view **Lista** (igual ao modo Foco), reutilizando `InboxZeroState`.
+- **Deals (UX)**:
+  - `DealDetailModal` agora é **responsivo em telas menores**: a sidebar de detalhes passa a ficar **empilhada acima** do conteúdo (em vez de colunas lado a lado), evitando sensação de “sobreposição”/corte.
+  - Detalhe técnico: body do modal usa `flex-col md:flex-row` + `min-h-0`; sidebar esquerda ganhou `max-h-[38vh]` no mobile e borda `border-b` (no desktop mantém `md:border-r`).
+  - Detalhe técnico (layout shell): o overlay do modal/cockpit agora **não cobre a sidebar no desktop** — em `md+` ele é deslocado por `md:left-64` (ou `md:left-20` quando a sidebar está colapsada), fazendo o conteúdo **redimensionar** em vez de “ficar por cima”.
 
 ## 26/12/2025
 

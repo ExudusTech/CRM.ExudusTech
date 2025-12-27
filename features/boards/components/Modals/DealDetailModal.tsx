@@ -75,6 +75,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     activeBoard,
     boards,
     lifecycleStages,
+    sidebarCollapsed,
   } = useCRM();
   const { profile } = useAuth();
   const { addToast } = useToast();
@@ -377,8 +378,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
     <FocusTrap active={isOpen} onEscape={onClose}>
       <div
         // Backdrop + positioning wrapper. Clicking outside the panel should close the modal.
-        // Use a high z-index so it never renders behind fixed sidebars/overlays.
-        className="fixed inset-0 z-9999 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+        // No desktop, este modal não deve cobrir a sidebar de navegação.
+        // Em md+ deslocamos o overlay pela largura da sidebar (w-64 expandida, w-20 colapsada).
+        className={`fixed inset-y-0 right-0 left-0 ${sidebarCollapsed ? 'md:left-20' : 'md:left-64'} z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
@@ -589,9 +591,9 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
             )}
           </div>
 
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
             {/* Left Sidebar (Static Info + Custom Fields) */}
-            <div className="w-1/3 border-r border-slate-200 dark:border-white/5 p-6 overflow-y-auto bg-white dark:bg-dark-card">
+            <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/5 p-4 sm:p-6 overflow-y-auto bg-white dark:bg-dark-card max-h-[38vh] md:max-h-none">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xs font-bold text-slate-400 uppercase mb-2 flex items-center gap-2">
@@ -776,7 +778,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
             </div>
 
             {/* Right Content (Tabs & Timeline) */}
-            <div className="flex-1 flex flex-col bg-white dark:bg-dark-card">
+            <div className="flex-1 min-h-0 flex flex-col bg-white dark:bg-dark-card">
               <div className="h-14 border-b border-slate-200 dark:border-white/5 flex items-center px-6 shrink-0">
                 <div className="flex gap-6">
                   <button
