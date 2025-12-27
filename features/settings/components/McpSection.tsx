@@ -246,7 +246,7 @@ export const McpSection: React.FC = () => {
               </div>
               <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                 {testResult?.ok
-                  ? 'Seu MCP está respondendo. Agora é só abrir no Inspector.'
+                  ? 'Seu MCP está respondendo. Copie a URL e conecte no seu cliente MCP.'
                   : 'Um clique: cria uma API key e testa a conexão.'}
               </div>
               <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
@@ -268,11 +268,11 @@ export const McpSection: React.FC = () => {
               ) : (
                 <button
                   type="button"
-                  onClick={() => copy('Comando MCP Inspector', inspectorCommand)}
+                  onClick={() => copy('URL do MCP', fullEndpoint)}
                   className="px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold inline-flex items-center gap-2"
                 >
-                  <TerminalSquare className="h-4 w-4" />
-                  Copiar comando do Inspector
+                  <Copy className="h-4 w-4" />
+                  Copiar URL do MCP
                 </button>
               )}
 
@@ -302,8 +302,13 @@ export const McpSection: React.FC = () => {
                   </>
                 ) : null}
               </div>
-              <div className="mt-3 text-xs font-mono whitespace-pre-wrap rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white/70 dark:bg-black/20 p-3 text-slate-800 dark:text-slate-100">
-                {inspectorCommand}
+              <div className="mt-3 rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white/70 dark:bg-black/20 p-3">
+                <div className="text-xs text-slate-700 dark:text-slate-200">
+                  URL do MCP:
+                </div>
+                <div className="mt-1 text-xs font-mono break-all text-slate-800 dark:text-slate-100">
+                  {fullEndpoint}
+                </div>
               </div>
             </div>
           )}
@@ -334,7 +339,7 @@ export const McpSection: React.FC = () => {
               <div className="text-xs text-slate-600 dark:text-slate-300 mb-3">
                 Cole a chave (não é salva). Autenticação: <span className="font-mono">Authorization: Bearer {'<API_KEY>'}</span>.
               </div>
-              <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-wrap gap-2 items-center">
                 <input
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
@@ -380,6 +385,14 @@ export const McpSection: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => copy('Comando MCP Inspector', inspectorCommand)}
+                  className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white text-sm font-semibold inline-flex items-center gap-2"
+                >
+                  <TerminalSquare className="h-4 w-4" />
+                  Copiar comando do Inspector
+                </button>
                 <button
                   type="button"
                   onClick={() => copy('cURL initialize', curlInitialize)}
@@ -440,24 +453,24 @@ export const McpSection: React.FC = () => {
                   Esse JSON existe para diagnóstico/healthcheck. No dia a dia, você normalmente só precisa da URL do MCP e da API key.
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
+            <button
+              type="button"
                     onClick={copyMetadata}
-                    className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white text-sm font-semibold inline-flex items-center gap-2"
-                  >
-                    <Copy className="h-4 w-4" />
+              className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white text-sm font-semibold inline-flex items-center gap-2"
+            >
+              <Copy className="h-4 w-4" />
                     Copiar metadata
-                  </button>
-                  <a
+            </button>
+            <a
                     href={metadataUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white text-sm font-semibold inline-flex items-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-800 dark:text-white text-sm font-semibold inline-flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
                     Abrir metadata
-                  </a>
-                </div>
+            </a>
+          </div>
               </div>
             </div>
           )}

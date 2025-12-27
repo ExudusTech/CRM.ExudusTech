@@ -109,8 +109,8 @@ const IntegrationsSettings: React.FC = () => {
 
   useEffect(() => {
     const syncFromHash = () => {
-      const h = typeof window !== 'undefined' ? (window.location.hash || '').replace('#', '') : '';
-      if (h === 'webhooks' || h === 'api' || h === 'mcp') setSubTab(h as IntegrationsSubTab);
+    const h = typeof window !== 'undefined' ? (window.location.hash || '').replace('#', '') : '';
+    if (h === 'webhooks' || h === 'api' || h === 'mcp') setSubTab(h as IntegrationsSubTab);
     };
 
     syncFromHash();

@@ -45,6 +45,8 @@
     - Ao colar o **PAT**, o Wizard agora **lista projetos automaticamente** (com debounce) e, se não encontrar nenhum, sugere **criar um projeto automaticamente** (já seguindo com auto-preenchimento).
     - Refatorado para **progressive disclosure**: primeiro pede só o **PAT**, depois o usuário escolhe/cria o projeto (com seleção de **organização** quando houver múltiplas), e só então aparecem toggles/detalhes (campos avançados ficam escondidos).
     - Copy: esclarecido que o token necessário é o **Access Token (PAT)** (prefixo `sbp_`) e **não** o token da “Experimental API”.
+    - Troubleshooting: o Wizard agora alerta quando detecta **2+ projetos ativos** (limite do Free) e mostra orientação antes de tentar criar projeto.
+    - Troubleshooting (mágico): quando detecta 2+ ativos, o Wizard lista os projetos ativos e oferece “**Usar este projeto**” para selecionar com 1 clique.
 
 - **Build (fix)**:
   - Corrigidos erros de typecheck no build (`next build`):

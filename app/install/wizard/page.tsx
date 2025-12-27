@@ -436,6 +436,23 @@ export default function InstallWizardPage() {
     return map;
   }, [supabaseOrgs]);
 
+  const supabaseActiveProjects = useMemo(() => {
+    return supabaseProjects.filter((p) => (p.status || '').toUpperCase().startsWith('ACTIVE'));
+  }, [supabaseProjects]);
+
+  const supabaseActiveCount = supabaseActiveProjects.length;
+
+  const selectSupabaseProject = (ref: string) => {
+    const selected = supabaseProjects.find((p) => p.ref === ref) || null;
+    if (!selected) return;
+    setSupabaseSelectedProjectRef(selected.ref);
+    setSupabaseUrl(selected.supabaseUrl);
+    setSupabaseProjectRefTouched(true);
+    setSupabaseProjectRef(selected.ref);
+    setSupabaseResolveError(null);
+    setSupabaseUiStep('final');
+  };
+
   useEffect(() => {
     // “100% mágico”: ao colar o PAT, lista projetos automaticamente (com debounce) e evita spam.
     if (supabaseMode !== 'existing') return;
@@ -522,7 +539,14 @@ export default function InstallWizardPage() {
       setSupabaseUiStep('final');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Falha ao criar projeto';
-      setSupabaseCreateError(message);
+      // Better troubleshooting for Free plan limit
+      if (String(message).toLowerCase().includes('limit of 2 active projects')) {
+        setSupabaseCreateError(
+          'Você já atingiu o limite do Free: 2 projetos ativos. Escolha um projeto existente, pause um projeto antigo, ou faça upgrade no Supabase.'
+        );
+      } else {
+        setSupabaseCreateError(message);
+      }
     } finally {
       setSupabaseCreating(false);
     }
@@ -861,6 +885,61 @@ export default function InstallWizardPage() {
                             </div>
                           ) : null}
 
+                          {supabaseActiveCount >= 2 ? (
+                            <div className="rounded-lg border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-900/20 p-3 text-amber-700 dark:text-amber-300 text-sm space-y-2">
+                              <div className="font-semibold">
+                                Detectamos {supabaseActiveCount} projetos ativos.
+                              </div>
+                              <div className="text-xs">
+                                No plano Free, o Supabase limita a <b>2 projetos ativos</b> (o limite é por conta, não por org).
+                                Se você tentar criar um projeto novo e falhar, selecione um existente ou pause um projeto antigo.
+                              </div>
+                              <div className="pt-1 space-y-2">
+                                {supabaseActiveProjects.slice(0, 6).map((p) => (
+                                  <div
+                                    key={p.ref}
+                                    className="flex items-center justify-between gap-2 rounded-md border border-amber-200/60 dark:border-amber-500/20 bg-white/50 dark:bg-slate-900/30 p-2"
+                                  >
+                                    <div className="min-w-0">
+                                      <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                        {p.name}
+                                      </div>
+                                      <div className="text-[11px] text-slate-600 dark:text-slate-300 truncate">
+                                        {p.organizationSlug
+                                          ? `${orgNameBySlug.get(p.organizationSlug) || p.organizationSlug} · `
+                                          : ''}
+                                        <span className="font-mono">{p.ref}</span>
+                                        {p.status ? ` · ${p.status}` : ''}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      <a
+                                        href={`https://supabase.com/dashboard/project/${encodeURIComponent(p.ref)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs underline underline-offset-2"
+                                      >
+                                        abrir
+                                      </a>
+                                      <button
+                                        type="button"
+                                        onClick={() => selectSupabaseProject(p.ref)}
+                                        className="px-2 py-1 rounded-md text-xs font-semibold bg-primary-600 text-white hover:bg-primary-500"
+                                      >
+                                        Usar este projeto
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                                {supabaseActiveProjects.length > 6 ? (
+                                  <div className="text-[11px] text-slate-600 dark:text-slate-300">
+                                    Mostrando 6 de {supabaseActiveProjects.length} ativos.
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+                          ) : null}
+
                           {!supabaseProjectsLoading &&
                           supabaseProjectsLoadedForPat === supabaseAccessToken.trim() &&
                           supabaseProjects.length === 0 ? (
@@ -891,16 +970,7 @@ export default function InstallWizardPage() {
                                 value={supabaseSelectedProjectRef}
                                 onChange={(e) => {
                                   const ref = e.target.value;
-                                  setSupabaseSelectedProjectRef(ref);
-                                  const selected =
-                                    supabaseProjects.find((p) => p.ref === ref) || null;
-                                  if (selected) {
-                                    setSupabaseUrl(selected.supabaseUrl);
-                                    setSupabaseProjectRefTouched(true);
-                                    setSupabaseProjectRef(selected.ref);
-                                    setSupabaseResolveError(null);
-                                    setSupabaseUiStep('final');
-                                  }
+                                  selectSupabaseProject(ref);
                                 }}
                                 className="w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
                               >
@@ -964,6 +1034,26 @@ export default function InstallWizardPage() {
                               ))}
                             </select>
                           </div>
+
+                          {supabaseActiveCount >= 2 ? (
+                            <div className="rounded-lg border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-900/20 p-3 text-amber-700 dark:text-amber-300 text-sm space-y-1">
+                              <div className="font-semibold">
+                                Atenção: {supabaseActiveCount} projetos ativos detectados.
+                              </div>
+                              <div className="text-xs">
+                                No Free o limite é 2 ativos; a criação pode falhar. Se acontecer, escolha um existente ou pause um projeto antigo.
+                              </div>
+                              <div className="pt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setSupabaseMode('existing')}
+                                  className="px-2 py-1 rounded-md text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800"
+                                >
+                                  Quero escolher um existente
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
 
                           <div className="space-y-2">
                             <label className="text-sm text-slate-600 dark:text-slate-300">
