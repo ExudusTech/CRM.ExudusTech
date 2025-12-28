@@ -563,8 +563,14 @@ export async function POST(req: Request) {
           vercel.projectId,
           vercel.teamId || undefined
         );
-      } catch {
-        // Non-fatal, continue
+      } catch (err) {
+        // Redeploy é obrigatório para aplicar NEXT_PUBLIC_* no build do Next.js.
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new Error(
+          'Falha ao redeployar na Vercel (necessário para aplicar as variáveis do Supabase). ' +
+            'Abra o projeto na Vercel → Deployments → Redeploy e tente novamente. ' +
+            (msg ? 'Detalhe: ' + msg : '')
+        );
       }
 
       await sendPhase('redeploy'); // Complete

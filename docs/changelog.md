@@ -2,6 +2,11 @@
 
 ## 28/12/2025
 
+- **Installer — Redeploy virou obrigatório**:
+  - Agora, se a Vercel falhar ao redeployar, o instalador **não finaliza** (evita deploy sem `NEXT_PUBLIC_SUPABASE_*` e login quebrado)
+  - Mensagem de erro aponta o caminho de **Redeploy manual** na Vercel
+
+
 - **Installer — Fix crash do wizard (React #310)**:
   - Corrigido `useCallback` (Trocar senha) que estava após um `return` condicional (`isHydrated`), causando **crash em produção** ao abrir `/install/wizard`
 
