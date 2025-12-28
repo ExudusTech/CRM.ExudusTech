@@ -1,0 +1,324 @@
+import { z } from 'zod';
+import { isAllowedOrigin } from '@/lib/security/sameOrigin';
+import { runSchemaMigration } from '@/lib/installer/migrations';
+import { bootstrapInstance } from '@/lib/installer/supabase';
+import { triggerProjectRedeploy, upsertProjectEnvs } from '@/lib/installer/vercel';
+import {
+  deployAllSupabaseEdgeFunctions,
+  extractProjectRefFromSupabaseUrl,
+  listEdgeFunctionSlugs,
+  resolveSupabaseApiKeys,
+  resolveSupabaseDbUrlViaCliLoginRole,
+  setSupabaseEdgeFunctionSecrets,
+  waitForSupabaseProjectReady,
+  type SupabaseFunctionDeployResult,
+} from '@/lib/installer/edgeFunctions';
+
+export const maxDuration = 300;
+export const runtime = 'nodejs';
+
+const RunSchema = z
+  .object({
+    installerToken: z.string().optional(),
+    vercel: z.object({
+      token: z.string().min(1),
+      teamId: z.string().optional(),
+      projectId: z.string().min(1),
+      targets: z.array(z.enum(['production', 'preview'])).min(1),
+    }),
+    supabase: z.object({
+      url: z.string().url(),
+      anonKey: z.string().min(1).optional(),
+      serviceRoleKey: z.string().min(1).optional(),
+      dbUrl: z.string().min(1).optional(),
+      accessToken: z.string().optional(),
+      projectRef: z.string().optional(),
+      deployEdgeFunctions: z.boolean().default(true),
+    }),
+    admin: z.object({
+      companyName: z.string().min(1).max(200),
+      email: z.string().email(),
+      password: z.string().min(6),
+    }),
+  })
+  .strict();
+
+// Mapeamento cinematográfico Interstellar
+const CINEMA_PHASES = {
+  coordinates: {
+    id: 'coordinates',
+    title: 'Calibrando coordenadas',
+    subtitle: 'Definindo rota para o destino...',
+  },
+  signal: {
+    id: 'signal',
+    title: 'Aguardando sinal',
+    subtitle: 'Confirmando conexão com o destino...',
+  },
+  station: {
+    id: 'station',
+    title: 'Construindo a estação',
+    subtitle: 'Preparando infraestrutura...',
+  },
+  comms: {
+    id: 'comms',
+    title: 'Ativando comunicadores',
+    subtitle: 'Estabelecendo canais de comunicação...',
+  },
+  contact: {
+    id: 'contact',
+    title: 'Primeiro contato',
+    subtitle: 'Criando sua identidade no novo mundo...',
+  },
+  landing: {
+    id: 'landing',
+    title: 'Preparando pouso',
+    subtitle: 'Finalizando a jornada...',
+  },
+  complete: {
+    id: 'complete',
+    title: 'Missão cumprida',
+    subtitle: 'Bem-vindo ao novo mundo.',
+  },
+} as const;
+
+type PhaseId = keyof typeof CINEMA_PHASES;
+
+interface StreamEvent {
+  type: 'phase' | 'progress' | 'error' | 'complete';
+  phase?: PhaseId;
+  title?: string;
+  subtitle?: string;
+  progress?: number; // 0-100
+  error?: string;
+  ok?: boolean;
+}
+
+export async function POST(req: Request) {
+  if (!isAllowedOrigin(req)) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+  }
+
+  if (process.env.INSTALLER_ENABLED === 'false') {
+    return new Response(JSON.stringify({ error: 'Installer disabled' }), { status: 403 });
+  }
+
+  const raw = await req.json().catch(() => null);
+  const parsed = RunSchema.safeParse(raw);
+  if (!parsed.success) {
+    return new Response(JSON.stringify({ error: 'Invalid payload', details: parsed.error.flatten() }), { status: 400 });
+  }
+
+  const expectedToken = process.env.INSTALLER_TOKEN;
+  if (expectedToken && parsed.data.installerToken !== expectedToken) {
+    return new Response(JSON.stringify({ error: 'Invalid installer token' }), { status: 403 });
+  }
+
+  const { vercel, supabase, admin } = parsed.data;
+  const envTargets = vercel.targets;
+
+  // Create SSE stream
+  const encoder = new TextEncoder();
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
+
+  const sendEvent = async (event: StreamEvent) => {
+    await writer.write(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+  };
+
+  const sendPhase = async (phase: PhaseId, progress: number) => {
+    const p = CINEMA_PHASES[phase];
+    await sendEvent({ type: 'phase', phase, title: p.title, subtitle: p.subtitle, progress });
+  };
+
+  // Run installation in background
+  (async () => {
+    let functions: SupabaseFunctionDeployResult[] | undefined;
+
+    try {
+      const resolvedProjectRef =
+        supabase.projectRef?.trim() ||
+        extractProjectRefFromSupabaseUrl(supabase.url) ||
+        '';
+      const resolvedAccessToken = supabase.accessToken?.trim() || '';
+
+      let resolvedAnonKey = supabase.anonKey?.trim() || '';
+      let resolvedServiceRoleKey = supabase.serviceRoleKey?.trim() || '';
+      let resolvedDbUrl = supabase.dbUrl?.trim() || '';
+
+      const needsKeys = !resolvedAnonKey || !resolvedServiceRoleKey;
+      const needsDb = !resolvedDbUrl;
+
+      const localEdgeFunctionSlugs = supabase.deployEdgeFunctions
+        ? await listEdgeFunctionSlugs()
+        : [];
+      const hasLocalEdgeFunctions = localEdgeFunctionSlugs.length > 0;
+
+      const needsManagementApi =
+        needsKeys || needsDb || (supabase.deployEdgeFunctions && hasLocalEdgeFunctions);
+
+      if (needsManagementApi && (!resolvedAccessToken || !resolvedProjectRef)) {
+        const message = !resolvedAccessToken
+          ? 'Token de acesso Supabase não fornecido.'
+          : 'Referência do projeto Supabase não encontrada.';
+        await sendEvent({ type: 'error', error: message });
+        await writer.close();
+        return;
+      }
+
+      // Phase 1: Coordinates (Vercel envs + resolve keys)
+      await sendPhase('coordinates', 5);
+
+      if (needsKeys) {
+        const keys = await resolveSupabaseApiKeys({
+          projectRef: resolvedProjectRef,
+          accessToken: resolvedAccessToken,
+        });
+        if (!keys.ok) {
+          await sendEvent({ type: 'error', error: 'Falha ao obter chaves de acesso.' });
+          await writer.close();
+          return;
+        }
+        resolvedAnonKey = keys.publishableKey;
+        resolvedServiceRoleKey = keys.secretKey;
+      }
+
+      await sendPhase('coordinates', 10);
+
+      if (needsDb) {
+        const db = await resolveSupabaseDbUrlViaCliLoginRole({
+          projectRef: resolvedProjectRef,
+          accessToken: resolvedAccessToken,
+        });
+        if (!db.ok) {
+          await sendEvent({ type: 'error', error: 'Falha ao conectar com o banco de dados.' });
+          await writer.close();
+          return;
+        }
+        resolvedDbUrl = db.dbUrl;
+      }
+
+      await sendPhase('coordinates', 15);
+
+      await upsertProjectEnvs(
+        vercel.token,
+        vercel.projectId,
+        [
+          { key: 'NEXT_PUBLIC_SUPABASE_URL', value: supabase.url, targets: envTargets },
+          { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', value: resolvedAnonKey, targets: envTargets },
+          { key: 'SUPABASE_SERVICE_ROLE_KEY', value: resolvedServiceRoleKey, targets: envTargets },
+          { key: 'INSTALLER_ENABLED', value: 'false', targets: envTargets },
+        ],
+        vercel.teamId || undefined
+      );
+
+      await sendPhase('coordinates', 20);
+
+      // Phase 2: Signal (wait for project ready)
+      await sendPhase('signal', 25);
+
+      if (resolvedAccessToken && resolvedProjectRef) {
+        const ready = await waitForSupabaseProjectReady({
+          accessToken: resolvedAccessToken,
+          projectRef: resolvedProjectRef,
+          timeoutMs: 210_000,
+          pollMs: 4_000,
+        });
+        if (!ready.ok) {
+          await sendEvent({ type: 'error', error: 'Destino não respondeu a tempo.' });
+          await writer.close();
+          return;
+        }
+      }
+
+      await sendPhase('signal', 35);
+
+      // Phase 3: Station (migrations)
+      await sendPhase('station', 40);
+
+      await runSchemaMigration(resolvedDbUrl);
+
+      await sendPhase('station', 55);
+
+      // Phase 4: Comms (edge functions)
+      await sendPhase('comms', 60);
+
+      if (supabase.deployEdgeFunctions && hasLocalEdgeFunctions) {
+        const secrets = await setSupabaseEdgeFunctionSecrets({
+          projectRef: resolvedProjectRef,
+          accessToken: resolvedAccessToken,
+          supabaseUrl: supabase.url,
+          anonKey: resolvedAnonKey,
+          serviceRoleKey: resolvedServiceRoleKey,
+        });
+
+        if (!secrets.ok) {
+          await sendEvent({ type: 'error', error: 'Falha ao configurar comunicadores.' });
+          await writer.close();
+          return;
+        }
+
+        await sendPhase('comms', 65);
+
+        functions = await deployAllSupabaseEdgeFunctions({
+          projectRef: resolvedProjectRef,
+          accessToken: resolvedAccessToken,
+        });
+      }
+
+      await sendPhase('comms', 75);
+
+      // Phase 5: Contact (bootstrap)
+      await sendPhase('contact', 80);
+
+      const bootstrap = await bootstrapInstance({
+        supabaseUrl: supabase.url,
+        serviceRoleKey: resolvedServiceRoleKey,
+        companyName: admin.companyName,
+        email: admin.email,
+        password: admin.password,
+      });
+
+      if (!bootstrap.ok) {
+        await sendEvent({ type: 'error', error: 'Falha ao estabelecer primeiro contato.' });
+        await writer.close();
+        return;
+      }
+
+      await sendPhase('contact', 90);
+
+      // Phase 6: Landing (redeploy)
+      await sendPhase('landing', 92);
+
+      try {
+        await triggerProjectRedeploy(
+          vercel.token,
+          vercel.projectId,
+          vercel.teamId || undefined
+        );
+      } catch {
+        // Non-fatal, continue
+      }
+
+      await sendPhase('landing', 98);
+
+      // Complete!
+      await sendPhase('complete', 100);
+      await sendEvent({ type: 'complete', ok: true });
+
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro durante a missão.';
+      await sendEvent({ type: 'error', error: message });
+    } finally {
+      await writer.close();
+    }
+  })();
+
+  return new Response(stream.readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    },
+  });
+}

@@ -72,9 +72,9 @@ function inferProjectRef(url: string): string | null {
     const host = new URL(url).hostname.toLowerCase();
     const m = host.match(/^([a-z0-9-]+)\.supabase\.(co|in)$/i);
     return m?.[1] || null;
-  } catch {
-    return null;
-  }
+    } catch {
+      return null;
+    }
 }
 
 export default function InstallWizardPage() {
@@ -89,7 +89,7 @@ export default function InstallWizardPage() {
   const [installerToken, setInstallerToken] = useState('');
   const [vercelToken, setVercelToken] = useState('');
   const [project, setProject] = useState<ProjectInfo | null>(null);
-  
+
   // Supabase
   const [supabaseAccessToken, setSupabaseAccessToken] = useState('');
   const [supabaseUrl, setSupabaseUrl] = useState('');
@@ -134,8 +134,8 @@ export default function InstallWizardPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmTouched, setConfirmTouched] = useState(false);
   
-  // Wizard
-  const [currentStep, setCurrentStep] = useState(0);
+  // Wizard - começa no passo 1 (Supabase), pois Vercel já foi validada no /install/start
+  const [currentStep, setCurrentStep] = useState(1);
   const [supabaseUiStep, setSupabaseUiStep] = useState<'pat' | 'deciding' | 'needspace' | 'creating' | 'done'>('pat');
   
   // Install
@@ -145,19 +145,21 @@ export default function InstallWizardPage() {
   const [showInstallOverlay, setShowInstallOverlay] = useState(false);
   const [cinePhase, setCinePhase] = useState<'preparing' | 'running' | 'success' | 'error'>('preparing');
   const [cineMessage, setCineMessage] = useState('Preparando a decolagem…');
+  const [cineSubtitle, setCineSubtitle] = useState('');
+  const [cineProgress, setCineProgress] = useState(0);
   
   // Parallax
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const mxSpring = useSpring(mx, { stiffness: 120, damping: 30, mass: 0.6 });
   const mySpring = useSpring(my, { stiffness: 120, damping: 30, mass: 0.6 });
-  
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     mx.set(((e.clientX - rect.left) / rect.width - 0.5) * 14);
     my.set(((e.clientY - rect.top) / rect.height - 0.5) * 10);
   };
-  
+
   const sceneVariants = {
     initial: { opacity: 0, y: 20, filter: 'blur(8px)' },
     animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
@@ -199,17 +201,17 @@ export default function InstallWizardPage() {
     })();
     return () => { cancelled = true; };
   }, []);
-  
+
   useEffect(() => {
     const savedToken = localStorage.getItem(STORAGE_TOKEN);
     const savedProject = localStorage.getItem(STORAGE_PROJECT);
     const savedInstallerToken = localStorage.getItem(STORAGE_INSTALLER_TOKEN);
-    
+
     if (!savedToken || !savedProject) {
       router.replace('/install/start');
       return;
     }
-    
+
     try {
       setVercelToken(savedToken);
       setProject(JSON.parse(savedProject));
@@ -219,15 +221,15 @@ export default function InstallWizardPage() {
       router.replace('/install/start');
     }
   }, [router]);
-  
+
   useEffect(() => {
     if (installerToken.trim()) localStorage.setItem(STORAGE_INSTALLER_TOKEN, installerToken.trim());
   }, [installerToken]);
-  
+
   useEffect(() => {
     if (!supabaseCreateDbPass) setSupabaseCreateDbPass(generateStrongPassword(20));
   }, [supabaseCreateDbPass]);
-  
+
   useEffect(() => {
     setSupabaseOrgs([]);
     setSupabaseOrgsError(null);
@@ -239,7 +241,7 @@ export default function InstallWizardPage() {
     setSupabasePreflight(null);
     setSupabaseCreateError(null);
   }, [supabaseAccessToken]);
-  
+
   useEffect(() => {
     if (supabaseUiStep !== 'pat') return;
     const pat = supabaseAccessToken.trim();
@@ -253,12 +255,14 @@ export default function InstallWizardPage() {
   useEffect(() => {
     if (!supabaseAccessToken.trim() || !supabaseUrl.trim()) return;
     if (supabaseResolving || supabaseResolvedOk) return;
+    // Não dispara resolve enquanto o projeto ainda está provisionando
+    if (supabaseProvisioning) return;
     
     if (resolveTimerRef.current) clearTimeout(resolveTimerRef.current);
     resolveTimerRef.current = setTimeout(() => void resolveKeys('auto'), 600);
     
     return () => { if (resolveTimerRef.current) clearTimeout(resolveTimerRef.current); };
-  }, [supabaseAccessToken, supabaseUrl, supabaseResolving, supabaseResolvedOk]);
+  }, [supabaseAccessToken, supabaseUrl, supabaseResolving, supabaseResolvedOk, supabaseProvisioning]);
   
   // API Functions
   const loadOrgsAndDecide = async () => {
@@ -308,8 +312,11 @@ export default function InstallWizardPage() {
   const decideAndCreate = async (orgs: SupabaseOrgOption[], preflight: typeof supabasePreflight) => {
     if (!preflight) return;
     
+    console.log('🔍 [SUPABASE] Preflight:', JSON.stringify(preflight, null, 2));
+    
     const paidOrg = preflight.organizations.find((o) => (o.plan || '').toLowerCase() !== 'free');
     if (paidOrg) {
+      console.log('💰 [SUPABASE] Usando org PAGA:', paidOrg.slug);
       await createProjectInOrg(paidOrg.slug, paidOrg.activeProjects.map((p) => p.name));
       return;
     }
@@ -318,10 +325,12 @@ export default function InstallWizardPage() {
       (o) => (o.plan || '').toLowerCase() === 'free' && o.activeCount < 2
     );
     if (freeOrgWithSlot) {
+      console.log('🆓 [SUPABASE] Usando org FREE com slot:', freeOrgWithSlot.slug, '- Projetos ativos:', freeOrgWithSlot.activeCount);
       await createProjectInOrg(freeOrgWithSlot.slug, freeOrgWithSlot.activeProjects.map((p) => p.name));
       return;
     }
     
+    console.log('🚫 [SUPABASE] Sem slots disponíveis');
     setSupabaseUiStep('needspace');
   };
   
@@ -332,21 +341,29 @@ export default function InstallWizardPage() {
     setSupabaseUiStep('creating');
     
     const projectName = suggestProjectName(existingNames);
+    const createStart = Date.now();
+    
+    console.log('🚀 [SUPABASE] Criando projeto:', projectName, 'na org:', orgSlug);
+    console.log('⏱️ [SUPABASE] Início:', new Date().toLocaleTimeString());
     
     try {
       const res = await fetch('/api/installer/supabase/create-project', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          installerToken: installerToken.trim() || undefined,
-          accessToken: supabaseAccessToken.trim(),
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            installerToken: installerToken.trim() || undefined,
+            accessToken: supabaseAccessToken.trim(),
           organizationSlug: orgSlug,
           name: projectName,
           dbPass: supabaseCreateDbPass,
           regionSmartGroup: 'americas',
-        }),
-      });
+          }),
+        });
       const data = await res.json();
+      
+      console.log('📦 [SUPABASE] Resposta create-project:', JSON.stringify(data));
+      console.log('⏱️ [SUPABASE] create-project levou:', ((Date.now() - createStart) / 1000).toFixed(1), 'segundos');
+      
       if (!res.ok) throw new Error(data?.error || 'Erro');
       
       const ref = String(data?.projectRef || '');
@@ -360,18 +377,26 @@ export default function InstallWizardPage() {
         setSupabaseProvisioning(true);
         setSupabaseProvisioningStatus('COMING_UP');
         
+        let pollCount = 0;
         const poll = async () => {
+          pollCount++;
           try {
             const st = await fetch('/api/installer/supabase/project-status', {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
               body: JSON.stringify({ installerToken: installerToken.trim() || undefined, accessToken: supabaseAccessToken.trim(), projectRef: ref }),
             });
             const stData = await st.json().catch(() => null);
             const status = stData?.status || '';
             setSupabaseProvisioningStatus(status);
             
+            console.log(`📊 [SUPABASE] Poll #${pollCount}: ${status} (${((Date.now() - createStart) / 1000).toFixed(0)}s)`);
+            
             if (status.toUpperCase().startsWith('ACTIVE')) {
+              const totalTime = ((Date.now() - createStart) / 1000).toFixed(1);
+              console.log('✅ [SUPABASE] Projeto ATIVO!');
+              console.log('⏱️ [SUPABASE] TEMPO TOTAL:', totalTime, 'segundos');
+              
               setSupabaseProvisioning(false);
               if (provisioningTimerRef.current) clearInterval(provisioningTimerRef.current);
               if (provisioningTimeoutRef.current) clearTimeout(provisioningTimeoutRef.current);
@@ -390,6 +415,7 @@ export default function InstallWizardPage() {
         }, 210_000);
       }
     } catch (err) {
+      console.error('❌ [SUPABASE] Erro:', err);
       setSupabaseCreateError(humanizeError(err instanceof Error ? err.message : 'Erro'));
       setSupabaseUiStep('needspace');
     } finally {
@@ -481,6 +507,8 @@ export default function InstallWizardPage() {
       } else {
         resolveAttemptsRef.current = 0;
         setSupabaseResolvedOk(true);
+        // Vai direto pro próximo passo — sem tela de confirmação
+        setCurrentStep(2);
       }
     } catch (err) {
       setSupabaseResolveError(err instanceof Error ? err.message : 'Erro');
@@ -497,13 +525,14 @@ export default function InstallWizardPage() {
     setShowInstallOverlay(true);
     setCinePhase('preparing');
     setCineMessage('Preparando a decolagem…');
+    setCineSubtitle('Verificando sistemas...');
+    setCineProgress(0);
     
     await new Promise((r) => setTimeout(r, 800));
     setCinePhase('running');
-    setCineMessage('Configurando ambiente…');
     
     try {
-      const res = await fetch('/api/installer/run', {
+      const res = await fetch('/api/installer/run-stream', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
@@ -521,28 +550,60 @@ export default function InstallWizardPage() {
           admin: { companyName: companyName.trim(), email: adminEmail.trim(), password: adminPassword },
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'Erro');
       
-      setResult(data as RunResult);
-      if (data?.ok) {
-        setCinePhase('success');
-        setCineMessage('Instalação concluída com sucesso!');
-      } else {
-        setCinePhase('error');
-        setCineMessage(data?.error || 'Algo deu errado.');
-        setRunError(data?.error);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData?.error || 'Erro ao iniciar instalação');
+      }
+      
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('Streaming não suportado');
+      
+      const decoder = new TextDecoder();
+      let buffer = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+        
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            
+            if (event.type === 'phase') {
+              setCineMessage(event.title || 'Processando...');
+              setCineSubtitle(event.subtitle || '');
+              setCineProgress(event.progress || 0);
+            } else if (event.type === 'complete' && event.ok) {
+              setCinePhase('success');
+              setCineMessage('Missão cumprida');
+              setCineSubtitle('Bem-vindo ao novo mundo.');
+              setCineProgress(100);
+              setResult({ ok: true, steps: [] });
+            } else if (event.type === 'error') {
+              throw new Error(event.error || 'Erro durante a instalação');
+            }
+          } catch (parseErr) {
+            console.warn('SSE parse error:', parseErr);
+          }
+        }
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro';
       setRunError(message);
       setCinePhase('error');
-      setCineMessage(message);
+      setCineMessage('Falha na missão');
+      setCineSubtitle(message);
     } finally {
       setInstalling(false);
     }
   };
-  
+
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -552,8 +613,8 @@ export default function InstallWizardPage() {
   }
   
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, 3));
-  const goBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
-  
+  const goBack = () => setCurrentStep((s) => Math.max(s - 1, 1));
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden"
@@ -571,10 +632,10 @@ export default function InstallWizardPage() {
           style={{ x: mxSpring, y: mySpring }}
         />
       </div>
-      
+
       <div className="w-full max-w-lg relative z-10 px-4">
         <div className="flex justify-center gap-2 mb-8">
-          {[0, 1, 2, 3].map((i) => (
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
               className={`h-2 rounded-full transition-all duration-300 ${
@@ -582,20 +643,9 @@ export default function InstallWizardPage() {
               }`}
             />
           ))}
-        </div>
-        
-        <AnimatePresence mode="wait">
-          {currentStep === 0 && (
-            <motion.div key="step-vercel" variants={sceneVariants} initial="initial" animate="animate" exit="exit" transition={sceneTransition} className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-6">
-                <CheckCircle2 className="w-8 h-8 text-cyan-400" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">Vercel conectada</h1>
-              <p className="text-slate-400 mb-8">Projeto <span className="text-white font-medium">{project?.name}</span> pronto para configurar.</p>
-              <button onClick={goNext} className="w-full py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-lg transition-all shadow-lg shadow-cyan-500/25">Continuar</button>
-            </motion.div>
-          )}
-          
+
+        <AnimatePresence mode="wait">
           {currentStep === 1 && (
             <motion.div key="step-supabase" variants={sceneVariants} initial="initial" animate="animate" exit="exit" transition={sceneTransition}>
               <AnimatePresence mode="wait">
@@ -603,7 +653,7 @@ export default function InstallWizardPage() {
                   <motion.div key="supabase-pat" variants={sceneVariants} initial="initial" animate="animate" exit="exit" transition={sceneTransition} className="text-center">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-6">
                       <Sparkles className="w-8 h-8 text-emerald-400" />
-                    </div>
+                  </div>
                     <h1 className="text-2xl font-bold text-white mb-2">Conectar Supabase</h1>
                     <p className="text-slate-400 mb-6">Cole seu token de acesso para continuar.</p>
                     <input type="password" value={supabaseAccessToken} onChange={(e) => setSupabaseAccessToken(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-transparent mb-4" placeholder="sbp_..." autoFocus />
@@ -616,7 +666,7 @@ export default function InstallWizardPage() {
                   <motion.div key="supabase-deciding" variants={sceneVariants} initial="initial" animate="animate" exit="exit" transition={sceneTransition} className="text-center py-12">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-6">
                       <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-                    </div>
+                        </div>
                     <h1 className="text-2xl font-bold text-white mb-2">Preparando seu projeto</h1>
                     <p className="text-slate-400">Verificando sua conta Supabase…</p>
                   </motion.div>
@@ -627,27 +677,27 @@ export default function InstallWizardPage() {
                     <div className="text-center mb-6">
                       <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 mb-6">
                         <Pause className="w-8 h-8 text-amber-400" />
-                      </div>
+                        </div>
                       <h1 className="text-2xl font-bold text-white mb-2">Precisamos de espaço</h1>
                       <p className="text-slate-400">Seu plano permite 2 projetos ativos.<br />Pause um para continuar:</p>
-                    </div>
+                        </div>
                     <div className="space-y-3 mb-6">
                       {allFreeActiveProjects.map((p) => (
                         <div key={p.ref} className="flex items-center justify-between gap-4 bg-white/5 border border-white/10 rounded-xl p-4">
-                          <div className="min-w-0">
+                                    <div className="min-w-0">
                             <div className="text-white font-medium truncate">{p.name}</div>
                             <div className="text-slate-500 text-sm truncate">{p.orgName}</div>
-                          </div>
+                                      </div>
                           <button onClick={() => void pauseProject(p.ref)} disabled={supabasePausingRef === p.ref} className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-medium text-sm transition-all disabled:opacity-50 shrink-0">
                             {supabasePausingRef === p.ref ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Pausar'}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                                      </button>
+                                  </div>
+                                ))}
+                                </div>
                     <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-slate-400">
                       <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
                       <span>Você pode reativar a qualquer momento no painel do Supabase.</span>
-                    </div>
+                              </div>
                     {supabaseCreateError && <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-red-400 text-sm">{supabaseCreateError}</div>}
                   </motion.div>
                 )}
@@ -659,13 +709,13 @@ export default function InstallWizardPage() {
                       <motion.div className="absolute inset-2 rounded-full border-2 border-cyan-400/50" animate={{ scale: [1, 1.2, 1], opacity: [0.7, 0.2, 0.7] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }} />
                       <div className="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center">
                         <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
-                      </div>
-                    </div>
+                              </div>
+                            </div>
                     <h1 className="text-2xl font-bold text-white mb-2">Criando seu projeto</h1>
                     <p className="text-slate-400 mb-4">{supabaseProvisioningStatus === 'COMING_UP' ? 'Inicializando infraestrutura…' : supabaseProvisioningStatus ? `Status: ${supabaseProvisioningStatus}` : 'Preparando ambiente…'}</p>
                     <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div className="h-full bg-gradient-to-r from-cyan-400 to-teal-400" initial={{ width: '0%' }} animate={{ width: '100%' }} transition={{ duration: 60, ease: 'linear' }} />
-                    </div>
+                      <motion.div className="h-full bg-gradient-to-r from-cyan-400 to-teal-400" initial={{ width: '0%' }} animate={{ width: '100%' }} transition={{ duration: 120, ease: 'linear' }} />
+                              </div>
                     <p className="text-slate-500 text-sm mt-4">Isso pode levar até 2 minutos. Não feche esta página.</p>
                   </motion.div>
                 )}
@@ -715,7 +765,7 @@ export default function InstallWizardPage() {
                 <input type="password" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50" placeholder="Senha (mínimo 6 caracteres)" />
                 <input type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setConfirmTouched(true); }} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50" placeholder="Confirmar senha" />
                 {confirmTouched && !passwordsMatch && confirmPassword.length > 0 && <p className="text-red-400 text-sm">As senhas não conferem.</p>}
-              </div>
+                        </div>
               <button onClick={goNext} disabled={!adminReady} className="w-full mt-6 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-lg transition-all shadow-lg shadow-cyan-500/25 disabled:opacity-50">Continuar</button>
             </motion.div>
           )}
@@ -727,58 +777,184 @@ export default function InstallWizardPage() {
               <p className="text-slate-400 mb-8">Clique para iniciar a instalação do seu CRM.</p>
               <button onClick={runInstaller} disabled={!canInstall || installing} className="w-full py-5 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white font-bold text-xl transition-all shadow-xl shadow-cyan-500/30 disabled:opacity-50">
                 {installing ? <span className="flex items-center justify-center gap-3"><Loader2 className="w-6 h-6 animate-spin" />Instalando…</span> : '🚀 Lançar'}
-              </button>
+                        </button>
               {runError && !showInstallOverlay && <div className="mt-4 rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-red-400 text-sm">{runError}</div>}
             </motion.div>
           )}
         </AnimatePresence>
         
-        {currentStep > 0 && currentStep < 3 && supabaseUiStep !== 'creating' && supabaseUiStep !== 'deciding' && (
+        {currentStep > 1 && currentStep < 3 && supabaseUiStep !== 'creating' && supabaseUiStep !== 'deciding' && (
           <button onClick={goBack} className="mt-6 w-full py-3 text-slate-400 hover:text-white transition-colors">← Voltar</button>
-        )}
-      </div>
+                      )}
+                    </div>
       
       <AnimatePresence>
         {showInstallOverlay && (
           <motion.div key="install-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950">
+            {/* Background cinematográfico */}
             <div className="absolute inset-0 overflow-hidden">
-              <motion.div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2" animate={{ background: ['radial-gradient(circle, rgba(34,211,238,0.15) 0%, transparent 70%)', 'radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 70%)', 'radial-gradient(circle, rgba(34,211,238,0.15) 0%, transparent 70%)'] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
-              {cinePhase === 'running' && <motion.div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '40px 40px' }} animate={{ backgroundPositionY: ['0px', '-200px'] }} transition={{ duration: 10, repeat: Infinity, ease: 'linear' }} />}
+              {/* Gradiente pulsante */}
+              <motion.div 
+                className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2" 
+                animate={{ 
+                  background: [
+                    'radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 60%)', 
+                    'radial-gradient(circle, rgba(45,212,191,0.15) 0%, transparent 65%)', 
+                    'radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 60%)'
+                  ] 
+                }} 
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} 
+              />
+              {/* Estrelas em movimento */}
+              {cinePhase === 'running' && (
+                <motion.div 
+                  className="absolute inset-0" 
+                  style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)', 
+                    backgroundSize: '50px 50px' 
+                  }} 
+                  animate={{ backgroundPositionY: ['0px', '-300px'] }} 
+                  transition={{ duration: 8, repeat: Infinity, ease: 'linear' }} 
+                />
+              )}
+              {/* Vignette */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
             </div>
-            <div className="relative text-center px-4">
+            
+            <div className="relative text-center px-4 max-w-md">
+              {/* Ícone central */}
               <div className="relative inline-flex items-center justify-center w-32 h-32 mb-8">
                 {cinePhase === 'preparing' || cinePhase === 'running' ? (
                   <>
-                    <motion.div className="absolute inset-0 rounded-full border-2 border-cyan-400/30" animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} />
-                    <motion.div className="absolute inset-4 rounded-full border-2 border-cyan-400/50" animate={{ scale: [1, 1.3, 1], opacity: [0.7, 0.2, 0.7] }} transition={{ duration: 2, repeat: Infinity, delay: 0.3 }} />
-                    <div className="w-20 h-20 rounded-full bg-cyan-500/20 flex items-center justify-center"><Loader2 className="w-10 h-10 text-cyan-400 animate-spin" /></div>
+                    {/* Anéis pulsantes estilo radar */}
+                    <motion.div 
+                      className="absolute inset-0 rounded-full border border-cyan-400/20" 
+                      animate={{ scale: [1, 2, 2], opacity: [0.6, 0, 0] }} 
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut' }} 
+                    />
+                    <motion.div 
+                      className="absolute inset-0 rounded-full border border-cyan-400/20" 
+                      animate={{ scale: [1, 2, 2], opacity: [0.6, 0, 0] }} 
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut', delay: 0.8 }} 
+                    />
+                    <motion.div 
+                      className="absolute inset-0 rounded-full border border-cyan-400/20" 
+                      animate={{ scale: [1, 2, 2], opacity: [0.6, 0, 0] }} 
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeOut', delay: 1.6 }} 
+                    />
+                    {/* Círculo central com spinner */}
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border border-cyan-400/30 flex items-center justify-center backdrop-blur-sm">
+                      <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
+                    </div>
                   </>
                 ) : cinePhase === 'success' ? (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }} className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center"><CheckCircle2 className="w-16 h-16 text-white" /></motion.div>
+                  <>
+                    {/* Explosão de partículas no sucesso */}
+                    <motion.div className="absolute inset-0 pointer-events-none">
+                      {Array.from({ length: 24 }).map((_, i) => {
+                        const angle = (Math.PI * 2 * i) / 24;
+                        const distance = 120 + Math.random() * 80;
+                        return (
+                          <motion.div 
+                            key={i} 
+                            className="absolute left-1/2 top-1/2 w-2 h-2 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" 
+                            initial={{ x: 0, y: 0, opacity: 1, scale: 1 }} 
+                            animate={{ 
+                              x: Math.cos(angle) * distance, 
+                              y: Math.sin(angle) * distance, 
+                              opacity: 0,
+                              scale: 0.5
+                            }} 
+                            transition={{ duration: 1.2, delay: i * 0.03, ease: 'easeOut' }} 
+                          />
+                        );
+                      })}
+                    </motion.div>
+                    <motion.div 
+                      initial={{ scale: 0, rotate: -180 }} 
+                      animate={{ scale: 1, rotate: 0 }} 
+                      transition={{ type: 'spring', stiffness: 200, damping: 15 }} 
+                      className="w-32 h-32 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                    >
+                      <CheckCircle2 className="w-16 h-16 text-white" />
+                    </motion.div>
+                  </>
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-red-500/20 flex items-center justify-center"><AlertCircle className="w-16 h-16 text-red-400" /></div>
+                  <motion.div 
+                    initial={{ scale: 0.8 }} 
+                    animate={{ scale: 1 }}
+                    className="w-32 h-32 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center"
+                  >
+                    <AlertCircle className="w-16 h-16 text-red-400" />
+                  </motion.div>
                 )}
               </div>
-              <motion.h1 key={cineMessage} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold text-white mb-4">{cineMessage}</motion.h1>
-              {cinePhase === 'running' && <p className="text-slate-400 mb-8">Configurando ambiente, aplicando migrações e preparando tudo para você.</p>}
-              {cinePhase === 'success' && (
-                <>
-                  <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    {Array.from({ length: 20 }).map((_, i) => {
-                      const angle = (Math.PI * 2 * i) / 20;
-                      const distance = 150 + Math.random() * 100;
-                      return <motion.div key={i} className="absolute left-1/2 top-1/2 w-2 h-2 rounded-full bg-cyan-400" initial={{ x: 0, y: 0, opacity: 1 }} animate={{ x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, opacity: 0 }} transition={{ duration: 1, delay: i * 0.02, ease: 'easeOut' }} />;
-                    })}
-                  </motion.div>
-                  <p className="text-slate-400 mb-8">Seu CRM está pronto. Aguarde o redeploy e faça login.</p>
-                  <button onClick={() => setShowInstallOverlay(false)} className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-semibold text-lg shadow-lg shadow-cyan-500/30">Concluir</button>
-                </>
+              
+              {/* Título principal */}
+              <AnimatePresence mode="wait">
+                <motion.h1 
+                  key={cineMessage} 
+                  initial={{ opacity: 0, y: 20 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-3xl font-bold text-white mb-3"
+                >
+                  {cineMessage}
+                </motion.h1>
+              </AnimatePresence>
+              
+              {/* Subtítulo */}
+              <AnimatePresence mode="wait">
+                <motion.p 
+                  key={cineSubtitle} 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  className="text-slate-400 mb-6 h-6"
+                >
+                  {cineSubtitle}
+                </motion.p>
+              </AnimatePresence>
+              
+              {/* Barra de progresso (só durante running) */}
+              {cinePhase === 'running' && (
+                <div className="w-full max-w-xs mx-auto mb-8">
+                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-cyan-400 to-teal-400 rounded-full"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${cineProgress}%` }}
+                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">{cineProgress}%</p>
+                </div>
               )}
+              
+              {/* Botões de ação */}
+              {cinePhase === 'success' && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                  <p className="text-slate-400 mb-6">Seu CRM está pronto. Aguarde o redeploy e faça login.</p>
+                  <button 
+                    onClick={() => setShowInstallOverlay(false)} 
+                    className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white font-semibold text-lg shadow-lg shadow-cyan-500/30 transition-all"
+                  >
+                    Concluir
+                  </button>
+                </motion.div>
+              )}
+              
               {cinePhase === 'error' && (
-                <>
-                  <p className="text-slate-400 mb-8">{runError || 'Algo deu errado durante a instalação.'}</p>
-                  <button onClick={() => setShowInstallOverlay(false)} className="px-8 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all">Voltar</button>
-                </>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <p className="text-red-400/80 mb-6">{runError || 'Algo deu errado durante a instalação.'}</p>
+                  <button 
+                    onClick={() => setShowInstallOverlay(false)} 
+                    className="px-8 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all"
+                  >
+                    Voltar
+                  </button>
+                </motion.div>
               )}
             </div>
           </motion.div>

@@ -6,7 +6,6 @@ import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Sparkles } from 'luci
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion';
 
 type InstallerMeta = { enabled: boolean; requiresToken: boolean };
-type ProjectInfo = { id: string; name: string; teamId?: string; url?: string };
 
 const STORAGE_TOKEN = 'crm_install_token';
 const STORAGE_PROJECT = 'crm_install_project';
@@ -19,9 +18,8 @@ export default function InstallStartPage() {
   const [metaError, setMetaError] = useState<string | null>(null);
   const [installerToken, setInstallerToken] = useState('');
   const [token, setToken] = useState('');
-  const [project, setProject] = useState<ProjectInfo | null>(null);
   const [error, setError] = useState('');
-  const [step, setStep] = useState<'input' | 'validating' | 'confirm' | 'success'>('input');
+  const [step, setStep] = useState<'input' | 'validating' | 'success'>('input');
   const [isLoading, setIsLoading] = useState(false);
   
   const mx = useMotionValue(0);
@@ -63,16 +61,11 @@ export default function InstallStartPage() {
     
     if (savedInstallerToken) setInstallerToken(savedInstallerToken);
     
+    // Se já tem dados salvos, vai direto pro wizard
     if (savedToken && savedProject) {
-      try {
-        setToken(savedToken);
-        setProject(JSON.parse(savedProject));
-        setStep('confirm');
-      } catch {
-        localStorage.removeItem(STORAGE_PROJECT);
-      }
+      router.push('/install/wizard');
     }
-  }, []);
+  }, [router]);
   
   useEffect(() => {
     if (step !== 'input') return;
@@ -109,31 +102,19 @@ export default function InstallStartPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Erro ao validar token');
       
-      setProject(data.project);
-      setStep('confirm');
+      // Salva e vai direto pro wizard — sem confirmação!
+      localStorage.setItem(STORAGE_TOKEN, t);
+      localStorage.setItem(STORAGE_PROJECT, JSON.stringify(data.project));
+      if (installerToken.trim()) localStorage.setItem(STORAGE_INSTALLER_TOKEN, installerToken.trim());
+      
+      setStep('success');
+      setTimeout(() => router.push('/install/wizard'), 600);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao validar token');
       setStep('input');
     } finally {
       setIsLoading(false);
     }
-  };
-  
-  const handleConfirm = () => {
-    if (!project) return;
-    
-    localStorage.setItem(STORAGE_TOKEN, token.trim());
-    localStorage.setItem(STORAGE_PROJECT, JSON.stringify(project));
-    if (installerToken.trim()) localStorage.setItem(STORAGE_INSTALLER_TOKEN, installerToken.trim());
-    
-    setStep('success');
-    setTimeout(() => router.push('/install/wizard'), 600);
-  };
-  
-  const handleReset = () => {
-    setProject(null);
-    setStep('input');
-    setError('');
   };
   
   if (!meta && !metaError) {
@@ -247,41 +228,6 @@ export default function InstallStartPage() {
               
               <h1 className="text-2xl font-bold text-white mb-2">Detectando projeto</h1>
               <p className="text-slate-400">Verificando sua conta Vercel…</p>
-            </motion.div>
-          )}
-          
-          {step === 'confirm' && project && (
-            <motion.div
-              key="step-confirm"
-              variants={sceneVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={sceneTransition}
-              className="text-center"
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-6">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
-              </div>
-              
-              <h1 className="text-2xl font-bold text-white mb-2">Projeto encontrado</h1>
-              <p className="text-slate-400 mb-6">
-                <span className="text-white font-medium">{project.name}</span>
-              </p>
-              
-              <button
-                onClick={handleConfirm}
-                className="w-full py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-white font-semibold text-lg transition-all shadow-lg shadow-cyan-500/25 mb-3"
-              >
-                Continuar
-              </button>
-              
-              <button
-                onClick={handleReset}
-                className="w-full py-3 text-slate-400 hover:text-white transition-colors"
-              >
-                Usar outro token
-              </button>
             </motion.div>
           )}
           
