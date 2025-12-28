@@ -2,6 +2,21 @@
 
 ## 28/12/2025
 
+
+- **Installer — Prevenção de Loops de Auto-Submit**:
+  - **Fix no `/install/start`**: adicionada verificação `!error` no auto-submit do token Vercel
+    - Antes: se o token era inválido (401), voltava pra tela mas tentava novamente em loop infinito
+    - Agora: se há erro setado, o auto-submit não dispara até o usuário limpar/alterar o token
+  - **Fix no `/install/wizard`**: adicionada verificação `supabaseResolveError` no auto-resolve
+    - Antes: se o resolve falhava, o useEffect disparava novamente causando loop
+    - Agora: se há erro de resolve, não tenta novamente automaticamente
+  - **Auditoria completa**: verificados todos os useEffects com setTimeout/setInterval
+    - `loadOrgsAndDecide` ✅ - já verificava `supabaseOrgsError`
+    - `resolveKeys` ⚠️ → **corrigido** - agora verifica `supabaseResolveError`
+    - `provisioningTimer` ✅ - tem timeout de 210s e cleanup adequado
+
+
+
 - **Installer Wizard — Experiência Cinematográfica de Provisioning**:
   - **Pula tela 'creating' quando automático**: Se org paga é detectada, vai direto para a tela de provisioning sem mostrar tela intermediária com senha do DB
   - **Mensagens rotativas estilo Interstellar**: A cada 12s, uma nova mensagem aparece com animação fade:
