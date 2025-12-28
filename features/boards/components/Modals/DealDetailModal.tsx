@@ -379,6 +379,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
   const isMobile = mode === 'mobile';
 
   const inner = (
+    <>
     <div
       className={
         isMobile
@@ -1152,7 +1153,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
         </div>
 
         <ConfirmModal
-          isOpen={!!deleteId}
+          isOpen={Boolean(deleteId)}
           onClose={() => setDeleteId(null)}
           onConfirm={confirmDeleteDeal}
           title="Excluir Negócio"
@@ -1207,7 +1208,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({ dealId, isOpen
           }}
           dealTitle={deal.title}
         />
-    </div>
+    </>
   );
 
   if (isMobile) {

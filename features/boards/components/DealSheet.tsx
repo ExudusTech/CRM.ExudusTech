@@ -15,7 +15,7 @@ export interface DealSheetProps {
  *
  * Desktop continues to use the existing modal implementation; this is used only on mobile.
  */
-export function DealSheet({ isOpen, onClose, ariaLabel, children }: DealSheetProps) {
+export function DealSheet({ isOpen, onClose, ariaLabel, children, className }: DealSheetProps) {
   return (
     <Sheet
       isOpen={isOpen}
