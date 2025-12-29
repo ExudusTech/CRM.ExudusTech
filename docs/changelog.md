@@ -562,3 +562,12 @@
 - **Problema**: Quando o token Supabase já estava salvo no `localStorage`, a tela de input aparecia rapidamente (já preenchida) e sumia antes de redirecionar para o wizard
 - **Fix**: Agora, quando o token Supabase já está salvo, o fluxo redireciona **direto para o wizard** sem mostrar a tela intermediária
 - **Resultado**: Transição mais limpa e rápida, sem "piscadas" visuais
+
+### 28/12/2025 — Nunca Reusar Projetos Supabase Existentes
+
+- **Problema**: Quando um projeto com o mesmo nome já existia (mesmo pausado), o installer reusava o projeto, que poderia ter schema/dados de deploy anterior (lixo)
+- **Fix**: 
+  - Removida lógica `reusedExisting` do endpoint `/api/installer/supabase/create-project`
+  - Agora **sempre retorna erro 409** quando o projeto já existe, independente do status
+  - Mensagem clara: `"Projeto com este nome já existe. Delete o projeto antigo no Supabase ou aguarde alguns minutos e tente novamente."`
+- **Rationale**: Projetos existentes podem ter configurações inconsistentes, migrations parciais ou dados obsoletos — sempre criar projeto novo garante ambiente limpo

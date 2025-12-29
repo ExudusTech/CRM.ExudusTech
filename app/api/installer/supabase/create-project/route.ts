@@ -47,50 +47,8 @@ export async function POST(req: Request) {
   });
 
   if (!created.ok) {
-    // If the project already exists (common after refresh/retry), reuse it instead of hard failing.
-    const msg = String(created.error || '').toLowerCase();
-    if ((created.status === 400 || created.status === 409) && msg.includes('already exists')) {
-      const existing = await listAllSupabaseOrganizationProjects({
-        accessToken: parsed.data.accessToken.trim(),
-        organizationSlug: parsed.data.organizationSlug.trim(),
-        // include INACTIVE/COMING_UP/etc so we can find partially created projects too
-        statuses: undefined,
-        search: parsed.data.name.trim(),
-      });
-      if (existing.ok) {
-        const match = existing.projects.find(
-          (p) => String(p?.name || '').toLowerCase().trim() === parsed.data.name.trim().toLowerCase()
-        );
-        if (match?.ref) {
-          return json({
-            ok: true,
-            projectRef: match.ref,
-            projectName: match.name,
-            supabaseUrl: `https://${match.ref}.supabase.co`,
-            reusedExisting: true,
-          });
-        }
-
-
-      // Fallback: if org-projects endpoint is unavailable (or search misses), try global projects list.
-      const allProjects = await listSupabaseProjects({ accessToken: parsed.data.accessToken.trim() });
-      if (allProjects.ok) {
-        const desired = parsed.data.name.trim().toLowerCase();
-        const match = allProjects.projects.find((p) => p.name.toLowerCase().trim() === desired);
-        if (match?.ref) {
-          return json({
-            ok: true,
-            projectRef: match.ref,
-            projectName: match.name,
-            supabaseUrl: `https://${match.ref}.supabase.co`,
-            reusedExisting: true,
-          });
-        }
-      }
-      }
-    }
-
-    // Supabase can reject creation due to plan limits; forward the message as-is.
+    // Never reuse existing projects — always fail if name conflicts.
+    // Rationale: existing projects may have stale data/schema from previous deployments.
     return json({ error: created.error, status: created.status, details: created.response }, created.status || 500);
   }
 

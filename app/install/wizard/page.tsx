@@ -82,6 +82,9 @@ function humanizeError(message: string) {
   if (lower.includes('maximum limits') || lower.includes('2 project limit') || lower.includes('limit of 2 active projects')) {
     return 'Limite do plano Free atingido. Pause um projeto existente para continuar.';
   }
+  if (lower.includes('already exists')) {
+    return 'Projeto com este nome já existe. Delete o projeto antigo no Supabase ou aguarde alguns minutos e tente novamente.';
+  }
   return message;
 }
 
