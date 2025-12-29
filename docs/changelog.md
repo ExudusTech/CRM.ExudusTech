@@ -2,6 +2,12 @@
 
 ## 28/12/2025
 
+- **Installer Wizard — Retry automático em queda de stream (SSE)**:
+  - **Problema**: `net::ERR_NETWORK_CHANGED` / “network error” pode abortar o streaming do `/api/installer/run-stream` mesmo com a instalação em andamento.
+  - **Solução**: retry automático **1x** ao detectar erros transitórios durante `reader.read()`; mantém o “save game” e tenta retomar sem perder progresso.
+  - **UX**: mostra subtítulo “Conexão instável — retomando…” e, se persistir, exibe mensagem amigável para retry manual.
+  - **Arquivo**: `app/install/wizard/page.tsx`
+
 - **Installer Wizard — Banner de pausa (fallback)**:
   - **Correção**: na tela "Precisamos de espaço", o banner amarelo agora aparece quando `pausePolling` **ou** `supabasePausingRef` estiverem ativos (garante banner mesmo se o estado global falhar).
   - **Arquivo**: `app/install/wizard/page.tsx`
