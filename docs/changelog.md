@@ -37,6 +37,9 @@
   - **Problema**: ao abrir detalhes do deal em `/boards`, o app caía com “Application error” e console mostrava **React error #310**.
   - **Causa**: `features/boards/components/Modals/DealDetailModal.tsx` chamava `useResponsiveMode()` **depois** de um `return null` condicional, quebrando a ordem de hooks quando o modal abria/fechava.
   - **Solução**: mover `useResponsiveMode()` para antes do early return, garantindo ordem consistente de hooks.
+  - **Prevenção**:
+    - `eslint` agora aplica `react-hooks/rules-of-hooks` como **error**.
+    - Adicionado teste de regressão `features/boards/components/Modals/DealDetailModal.test.tsx` (abre/fecha modal sem crash).
 
 ## 29/12/2025
 
