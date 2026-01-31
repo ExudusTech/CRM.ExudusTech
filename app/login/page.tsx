@@ -53,7 +53,7 @@ export default function LoginPage() {
             <div className="max-w-md w-full relative z-10 px-4">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display tracking-tight mb-2">
-                        Bem-vindo de volta
+                        Você veio!
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
                         Entre na sua conta para continuar.
